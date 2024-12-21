@@ -5,10 +5,10 @@
 //  Created by Takumi Otsuka on 9/28/24.
 //
 
+import SwiftUI
 import Foundation
 import FirebaseFirestore
 import Combine
-import SwiftUICore
 
 class ExploreViewModel: ObservableObject {
     @Published var books: [UserBook] = []
