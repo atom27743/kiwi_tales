@@ -186,7 +186,9 @@ class GenerateStoryViewModel: ObservableObject {
     
     private func processImageQueue() {
         guard !isProcessingQueue, !imageGenerationQueue.isEmpty else {
-            self.isLoading = false
+            if imageGenerationQueue.isEmpty && isFullyGenerated {
+                self.isLoading = false
+            }
             return
         }
         
@@ -227,7 +229,6 @@ class GenerateStoryViewModel: ObservableObject {
             
             await MainActor.run {
                 self.isProcessingQueue = false
-                self.isLoading = false
             }
         }
     }
@@ -503,6 +504,70 @@ class GenerateStoryViewModel: ObservableObject {
         }
     }
     
+//    func saveStory() {
+//        guard let userID = Auth.auth().currentUser?.uid else {
+//            print("Error: User not authenticated.")
+//            return
+//        }
+//
+//        guard let storySegment = self.storySegment else {
+//            print("Error: No story segment available.")
+//            return
+//        }
+//
+//        let bookID = UUID().uuidString
+//        self.isSaving = true
+//
+//        Task {
+//            do {
+//                // Upload images and generate URLs
+//                var imageURLs: [String] = []
+//
+//                for (index, image) in self.generatedImages.enumerated() {
+//                    if let image = image {
+//                        let imagePath = "books/\(userID)/\(bookID)/images/\(index).jpg"
+//
+//                        let url = try await StorageManager.shared.uploadImage(image: image, path: imagePath)
+//                        imageURLs.append(url.absoluteString)
+//                    } else {
+//                        imageURLs.append("")
+//                    }
+//                }
+//
+//                // Save all data to Firestore
+//                let storyData: [String: Any] = [
+//                    "book_id": bookID,
+//                    "user_id": userID,
+//                    "title": storySegment.title,
+//                    "cover_image_prompt": storySegment.coverImagePrompt,
+//                    "generated_texts": storySegment.contents.map { $0.sentence },
+//                    "image_prompts": storySegment.contents.map { $0.imagePrompt },
+//                    "image_urls": imageURLs,
+//                    "theme": self.selectedTheme,
+//                    "keywords": self.keywords,
+//                    "difficulty": self.selectedDifficulty,
+//                    "num_sentences": self.numSentences,
+//                    "date_created": FieldValue.serverTimestamp()
+//                ]
+//
+//                // Save story data to Firestore
+//                let db = Firestore.firestore()
+//                try await db.collection("books").document(bookID).setData(storyData)
+//
+//                print("Story saved successfully.")
+//                await MainActor.run {
+//                    self.isSaving = false
+//                    self.isSaved = true
+//                }
+//            } catch {
+//                print("Error saving story: \(error.localizedDescription)")
+//                await MainActor.run {
+//                    self.isSaving = false
+//                }
+//            }
+//        }
+//    }
+    
     func saveStory() {
         guard let userID = Auth.auth().currentUser?.uid else {
             print("Error: User not authenticated.")
@@ -524,7 +589,7 @@ class GenerateStoryViewModel: ObservableObject {
 
                 for (index, image) in self.generatedImages.enumerated() {
                     if let image = image {
-                        let imagePath = "books/\(userID)/images/\(index).jpg"
+                        let imagePath = "books/\(userID)/\(bookID)/images/\(index).jpg"
 
                         let url = try await StorageManager.shared.uploadImage(image: image, path: imagePath)
                         imageURLs.append(url.absoluteString)
@@ -542,9 +607,10 @@ class GenerateStoryViewModel: ObservableObject {
                     "generated_texts": storySegment.contents.map { $0.sentence },
                     "image_prompts": storySegment.contents.map { $0.imagePrompt },
                     "image_urls": imageURLs,
-                    "theme": self.selectedTheme,
-                    "keywords": self.keywords,
-                    "difficulty": self.selectedDifficulty,  
+                    "theme": self.selectedTheme,  // Ensure theme is saved
+                    "keywords": self.keywords,    // Ensure keywords are saved
+                    "difficulty": self.selectedDifficulty,  // Ensure difficulty is saved
+                    "num_sentences": self.numSentences,  // Save the number of sentences
                     "date_created": FieldValue.serverTimestamp()
                 ]
 
