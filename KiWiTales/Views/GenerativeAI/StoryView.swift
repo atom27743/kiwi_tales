@@ -63,79 +63,17 @@ struct ErrorView: View {
 
 struct StoryView: View {
     @ObservedObject var viewModel: GenerateStoryViewModel
-    var userBook: UserBook?
     @State private var currentPage: Int = 0
     @State private var dragOffset: CGFloat = .zero
     @State private var currentOffset: CGFloat = .zero
     @State private var isStoryStarted: Bool = false
-    @State private var showCustomAlert = false
-    @Binding var selectGenerate: Bool
+    @State private var showCustomAlert: Bool = false
 
-    // Computed property to check if the story is fully ready
-    var isReadyToDisplay: Bool {
-        return !viewModel.isLoading &&
-               viewModel.storySegment != nil &&
-               viewModel.generatedImages.count == viewModel.storySegment?.contents.count
-    }
+    @Binding var selectGenerate: Bool
 
     var body: some View {
         ZStack {
-            if !isReadyToDisplay {
-                LoadingView(message: "Loading story...")
-            } else if !isStoryStarted && viewModel.isCoverImageGenerated {
-                displayCoverPage()
-            } else if isStoryStarted && viewModel.storySegment != nil {
-                displayStoryContent()
-            }
-
-            displayExitButton()
-
-            if showCustomAlert {
-                CustomAlert(showCustomAlert: $showCustomAlert) {
-                    viewModel.saveStory()
-                    resetView()
-                } onExit: {
-                    resetView()
-                    selectGenerate = false
-                    showCustomAlert = false
-                }
-            }
-        }
-        .background(
-            Group {
-                if let uiImage = viewModel.generatedImages.safeElement(at: currentPage),
-                   let validImage = uiImage {
-                    Image(uiImage: validImage)
-                        .resizable()
-                        .scaledToFill()
-                        .blur(radius: 10)
-                        .ignoresSafeArea()
-                } else {
-                    Color.theme.background
-                        .ignoresSafeArea()
-                }
-            }
-        )
-    }
-
-    @ViewBuilder
-    private func displayCoverPage() -> some View {
-        if let coverImage = viewModel.generatedImages.first,
-           let validImage = coverImage {
-            VStack {
-                Image(uiImage: validImage)
-                    .resizable()
-                    .scaledToFill()
-                    .ignoresSafeArea()
-
-                Text(viewModel.storySegment?.title ?? "Loading Title...")
-                    .font(.title.bold())
-                    .foregroundColor(.black)
-                    .multilineTextAlignment(.center)
-                    .padding()
-
-                Spacer()
-
+            if !isStoryStarted {
                 Button(action: {
                     isStoryStarted = true
                 }) {
@@ -143,137 +81,154 @@ struct StoryView: View {
                         .font(.headline)
                         .foregroundColor(.white)
                         .padding()
-                        .background(Color.theme.accent)
-                        .cornerRadius(18)
-                }
-                .padding(.bottom, 40)
-            }
-        }
-    }
-
-    @ViewBuilder
-    private func displayStoryContent() -> some View {
-        if let segment = viewModel.storySegment {
-            GeometryReader { geometry in
-                VStack {
-                    HStack(spacing: 0) {
-                        ForEach(0..<segment.contents.count, id: \.self) { index in
-                            VStack {
-                                if let image = viewModel.generatedImages.safeElement(at: index + 1),
-                                   let uiImage = image {
-                                    Image(uiImage: uiImage)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(maxWidth: geometry.size.width * 0.8)
-                                        .cornerRadius(10)
-                                        .padding()
-                                } else {
-                                    ProgressView("Generating image...")
-                                        .frame(width: geometry.size.width * 0.8, height: 200)
-                                }
-
-                                Text(segment.contents[index].sentence)
-                                    .padding()
-                                    .multilineTextAlignment(.center)
-                            }
-                            .frame(width: geometry.size.width)
-                            .offset(x: geometry.size.width * CGFloat(index) + dragOffset + currentOffset)
-                        }
-                    }
-                    .gesture(
-                        DragGesture()
-                            .onChanged { value in
-                                if isReadyToDisplay {
-                                    dragOffset = value.translation.width
-                                }
-                            }
-                            .onEnded { value in
-                                if isReadyToDisplay {
-                                    let threshold = geometry.size.width * 0.5
-                                    let newPage = value.translation.width > threshold ? currentPage - 1 :
-                                        value.translation.width < -threshold ? currentPage + 1 :
-                                        currentPage
-
-                                    currentPage = max(0, min(newPage, segment.contents.count - 1))
-                                    withAnimation {
-                                        dragOffset = 0
-                                        currentOffset = -geometry.size.width * CGFloat(currentPage)
-                                    }
-                                }
-                            }
-                    )
-
-                    // Add save button at the bottom when on the last page
-                    if currentPage == segment.contents.count - 1 {
-                        VStack {
-                            if viewModel.isSaving {
-                                ProgressView("Saving story...")
-                                    .foregroundColor(.primary)
-                                    .padding()
-                            } else if !viewModel.isSaved {
-                                Button(action: {
-                                    viewModel.saveStory()
-                                }) {
-                                    HStack {
-                                        Image(systemName: "square.and.arrow.down")
-                                        Text("Save Story")
-                                    }
-                                    .padding()
-                                    .background(Color.accentColor)
-                                    .foregroundColor(.white)
-                                    .cornerRadius(10)
-                                }
-                                .padding(.bottom)
-                            } else {
-                                HStack {
-                                    Image(systemName: "checkmark.circle.fill")
-                                    Text("Story Saved!")
-                                }
-                                .foregroundColor(.green)
-                                .padding()
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    @ViewBuilder
-    private func displayExitButton() -> some View {
-        VStack {
-            HStack {
-                Button {
-                    if !viewModel.isSaved {
-                        showCustomAlert = true
-                    } else {
-                        showCustomAlert = false
-                        resetView()
-                    }
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(.white)
-                        .font(.system(size: 36))
+                        .background(Capsule().fill(Color.theme.accent))
                 }
                 .padding()
-
-                Spacer()
+            } else if let segment = viewModel.storySegment {
+                displayGeneratedStory(segment: segment)
             }
 
-            Spacer()
+            // Exit Button
+            displayExitButton()
+
+            // Custom Alert
+            if showCustomAlert {
+                CustomAlert(showCustomAlert: $showCustomAlert, onSaveAndExit: {
+                    viewModel.saveStory()
+                    resetView()
+                    selectGenerate = false
+                }, onExit: {
+                    resetView()
+                    selectGenerate = false
+                })
+            }
         }
+        .background(
+            Group {
+                if let image = viewModel.generatedImages[safe: currentPage], let validImage = image {
+                    Image(uiImage: validImage)
+                        .resizable()
+                        .scaledToFill()
+                        .blur(radius: 10)
+                        .ignoresSafeArea()
+                } else {
+                    Color.gray.opacity(0.2)
+                        .ignoresSafeArea()
+                }
+            }
+        )
     }
 
     private func resetView() {
         viewModel.keywords.removeAll()
         viewModel.selectedTheme.removeAll()
         viewModel.selectedDifficulty.removeAll()
-
         viewModel.isCoverImageGenerated = false
         viewModel.generatedImages.removeAll()
         isStoryStarted = false
-
         selectGenerate = false
+    }
+
+    @ViewBuilder
+    private func displayGeneratedStory(segment: StorySegment) -> some View {
+        GeometryReader { geometry in
+            HStack(spacing: 0) {
+                ForEach(segment.contents.indices, id: \.self) { index in
+                    PageView(imageURL: nil, imageName: viewModel.generatedImages[safe: index] ?? nil, text: segment.contents[index].sentence)
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                }
+            }
+            .frame(width: geometry.size.width * CGFloat(segment.contents.count), height: geometry.size.height)
+            .offset(x: self.currentOffset + self.dragOffset)
+            .gesture(
+                DragGesture()
+                    .onChanged { value in
+                        self.dragOffset = value.translation.width
+                    }
+                    .onEnded { value in
+                        let threshold = geometry.size.width / 2
+                        if value.predictedEndTranslation.width < -threshold && currentPage < segment.contents.count - 1 {
+                            currentPage += 1
+                        } else if value.predictedEndTranslation.width > threshold && currentPage > 0 {
+                            currentPage -= 1
+                        }
+                        withAnimation {
+                            dragOffset = 0
+                            currentOffset = -geometry.size.width * CGFloat(currentPage)
+                        }
+                    }
+            )
+        }
+
+        if currentPage >= segment.contents.count - 1 {
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    if viewModel.isSaved {
+                        Image(systemName: "checkmark")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .foregroundStyle(.white)
+                            .frame(width: 24, height: 24)
+                            .padding(8)
+                            .background(Color.green)
+                            .clipShape(Circle())
+                    } else {
+                        Button(action: {
+                            viewModel.saveStory()
+                        }) {
+                            if viewModel.isSaving {
+                                ProgressView()
+                                    .progressViewStyle(.circular)
+                            } else {
+                                Image(systemName: "square.and.arrow.down")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .foregroundStyle(.white)
+                                    .frame(width: 24, height: 24)
+                                    .padding(8)
+                                    .background(Color.accent)
+                                    .clipShape(Circle())
+                            }
+                        }
+                    }
+                }
+                .padding(.bottom, 134)
+                .padding(.trailing, 32)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+            .background(Color.clear)
+        }
+
+        PageIndicator(currentPage: $currentPage, totalPages: segment.contents.count)
+            .frame(maxHeight: .infinity, alignment: .top)
+            .padding(.horizontal, 60)
+            .padding(.top, 76)
+    }
+
+    @ViewBuilder
+    private func displayExitButton() -> some View {
+        VStack {
+            HStack {
+                Button(action: {
+                    if !viewModel.isSaved {
+                        showCustomAlert = true
+                    } else {
+                        resetView()
+                        selectGenerate = false
+                    }
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.white)
+                        .font(.system(size: 36))
+                }
+                .padding()
+
+                Spacer()
+            }
+            Spacer()
+        }
     }
 }
 
@@ -281,9 +236,6 @@ struct StoryView: View {
     StoryView(viewModel: .init(), selectGenerate: .constant(true))
 }
 
-//import SwiftUI
-//import FirebaseAuth
-//
 //struct StoryView: View {
 //    @ObservedObject var viewModel: GenerateStoryViewModel
 //    @State private var currentPage: Int = 0
@@ -336,3 +288,4 @@ struct StoryView: View {
 //        .padding()
 //    }
 //}
+
