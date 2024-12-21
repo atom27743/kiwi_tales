@@ -71,13 +71,13 @@ struct DashboardView: View {
 
             // Full screen story view
             if showStoryView && selectedIndex < userBooksViewModel.books.count {
-                StoryView(
-                    viewModel: storyViewModel,
-                    userBook: userBooksViewModel.books[selectedIndex],
-                    selectGenerate: .constant(false)
-                )
-                .transition(.opacity)
-                .zIndex(1)
+//                StoryView(
+//                    viewModel: storyViewModel,
+//                    userBook: userBooksViewModel.books[selectedIndex],
+//                    selectGenerate: .constant(false)
+//                )
+//                .transition(.opacity)
+//                .zIndex(1)
             }
         }
         .onAppear {
