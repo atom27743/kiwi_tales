@@ -116,18 +116,19 @@ struct HomeView: View {
                             .padding(.leading, 23)
                         }
                         .padding(.leading, 9)
-                        .padding(.bottom, -18)
+                        .padding(.bottom, -8)
                         .tint(.theme.text)
                         
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 22) {
-//                                books(exploreViewModel.books)
+                                books(exploreViewModel.books)
                             }
                             .frame(height: 170)
-                            .padding([.leading, .trailing], 23)
+                            .padding([.leading, .trailing], 30)
                             .foregroundStyle(.black)
                         }
                     }
+                    .padding(.top, 12)
                 }
                 .onAppear {
                     userBooksViewModel.fetchUserBooks()
@@ -137,17 +138,6 @@ struct HomeView: View {
             .tint(.theme.secondary)
             .background(Color.theme.background)
             .ignoresSafeArea()
-        }
-        .fullScreenCover(isPresented: $showStoryView) {
-            if let selectedBook = selectedBook {
-                StoryView(viewModel: viewModel, userBook: selectedBook, selectGenerate: $selectGenerate)
-            } else {
-                Text("No book selected")
-            }
-        }
-        // MARK: - Calls upon a GenerateStory Form where users can create their own stories
-        .fullScreenCover(isPresented: $selectGenerate) {
-            GenerateStoryView(authenticationViewModel: authenticationViewModel, generateStoryViewModel: viewModel, profileViewModel: profileViewModel, showSignInView: $showSignInView, selectGenerate: $selectGenerate)
         }
     }
     
