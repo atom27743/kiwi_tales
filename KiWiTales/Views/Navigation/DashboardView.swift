@@ -68,16 +68,13 @@ struct DashboardView: View {
             }
             .background(Color.theme.background)
             .ignoresSafeArea()
-
-            // Full screen story view
-            if showStoryView && selectedIndex < userBooksViewModel.books.count {
-//                StoryView(
-//                    viewModel: storyViewModel,
-//                    userBook: userBooksViewModel.books[selectedIndex],
-//                    selectGenerate: .constant(false)
-//                )
-//                .transition(.opacity)
-//                .zIndex(1)
+        }
+        .fullScreenCover(isPresented: $showStoryView) {
+            if let selectedBook = userBooksViewModel.books[safe: selectedIndex] {
+                BookStoryView(
+                    book: selectedBook,
+                    showStoryView: $showStoryView
+                )
             }
         }
         .onAppear {
