@@ -14,7 +14,7 @@ struct CustomAlert: View {
 
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: 15)
                 .fill(Material.ultraThinMaterial)
             
             VStack(spacing: 48) {
