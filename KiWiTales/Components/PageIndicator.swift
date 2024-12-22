@@ -15,7 +15,7 @@ struct PageIndicator: View {
         HStack(spacing: 8) {
             ForEach(0..<totalPages, id: \.self) { index in
                 Capsule()
-                    .fill(index <= currentPage ? Color.accentColor : Color.gray.opacity(0.3))
+                    .fill(index <= currentPage ? Color.accentColor : Color.white.opacity(0.8))
                     .frame(width: capsuleWidth(for: totalPages), height: 10)
                     .animation(.easeInOut(duration: 0.3), value: currentPage)
             }
