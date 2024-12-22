@@ -75,42 +75,39 @@ struct CustomSideNavigation: View {
                             
                             Spacer()
                             
-                            if Auth.auth().currentUser == nil {
-                                Button(action: {
-                                    Task {
-                                        do {
-                                            showMenu = false
-                                            try await viewModel.signInGoogle(profileViewModel: profileViewModel)
-                                            print("User signed in and profile loaded")
-                                        } catch {
-                                            print(error.localizedDescription)
-                                        }
+                            if let user = Auth.auth().currentUser {
+                                if user.isAnonymous {
+                                    Button {
+                                        showSignInView = true
+                                    } label: {
+                                        Text("Sign In")
+                                            .nunito(.bold, 18)
+                                            .foregroundStyle(.white)
+                                            .frame(height: 45)
+                                            .frame(maxWidth: .infinity)
+                                            .background(.blue)
+                                            .cornerRadius(10)
                                     }
-                                }) {
-                                    Text("Login")
-                                        .nunito(.bold, 18)
-                                        .padding()
-                                }
-                                .padding(.bottom, 40)
-                            } else {
-                                Button(action: {
-                                    Task {
-                                        do {
-                                            showMenu = false
-                                            try AuthenticationManager.shared.signOut()
-                                            
-                                            profileViewModel.resetUser()
-                                            print("User signed out and profile reset")
-                                        } catch {
-                                            print("Error signing out: \(error)")
+                                    .padding(.horizontal)
+                                    .padding(.bottom, 40)
+                                } else {
+                                    Button {
+                                        Task {
+                                            do {
+                                                showMenu = false
+                                                try AuthenticationManager.shared.signOut()
+                                                try await viewModel.signInAnonymously()
+                                            } catch {
+                                                print("Error: \(error)")
+                                            }
                                         }
+                                    } label: {
+                                        Text("Sign Out")
+                                            .nunito(.bold, 18)
+                                            .foregroundStyle(.red)
                                     }
-                                }) {
-                                    Text("Sign out")
-                                        .nunito(.bold,18)
-                                        .padding()
+                                    .padding(.bottom, 40)
                                 }
-                                .padding(.bottom, 40)
                             }
                         }
                         .frame(maxWidth: .infinity)
@@ -135,6 +132,11 @@ struct CustomSideNavigation: View {
         }
         .transition(.move(edge: .leading))
         .animation(.easeInOut(duration: 0.5), value: showMenu)
+        .sheet(isPresented: $showSignInView) {
+            AuthenticationView(showSignInView: $showSignInView)
+                .presentationDetents([.height(300)])
+                .presentationDragIndicator(.visible)
+        }
     }
     
     @ViewBuilder
@@ -161,4 +163,3 @@ struct CustomSideNavigation: View {
     
     CustomSideNavigation(viewModel: .init(), profileViewModel: .init(), selectedTab: $selectedTab, showMenu: .constant(true), showSignInView: .constant(false))
 }
-

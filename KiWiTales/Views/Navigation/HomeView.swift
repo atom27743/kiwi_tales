@@ -82,17 +82,17 @@ struct HomeView: View {
                         .padding(.bottom, -8)
                         .tint(.theme.text)
                         
-                        if profileViewModel.user != nil {
+                        if let user = profileViewModel.user {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 22) {
-                                    books(userBooksViewModel.books)
+                                    userBooks(userBooksViewModel.books)
                                 }
                                 .frame(height: 170)
                                 .padding([.leading, .trailing], 30)
                                 .foregroundStyle(.black)
                             }
                         } else {
-                            Text("Sign in to start creating stories.")
+                            Text("Sign in to view your stories")
                                 .frame(height: 170)
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 .padding(.leading, 23)
@@ -100,7 +100,7 @@ struct HomeView: View {
                     }
                     .padding(.top, 19)
                     
-                    // MARK: - Shows the top 5 books from the public
+                    // MARK: - Explore Section
                     VStack(alignment: .leading) {
                         Button {
                             selectedTab = .explore
@@ -108,7 +108,7 @@ struct HomeView: View {
                             HStack(spacing: 8) {
                                 Text("Explore")
                                     .nunito(.extraBold, 16)
-                                Image("explore")
+                                Image("family_star")
                                     .resizable()
                                     .scaledToFill()
                                     .frame(width: 22, height: 22)
@@ -121,11 +121,10 @@ struct HomeView: View {
                         
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 22) {
-                                books(exploreViewModel.books)
+                                exploreBooks(exploreViewModel.books)
                             }
                             .frame(height: 170)
                             .padding([.leading, .trailing], 30)
-                            .foregroundStyle(.black)
                         }
                     }
                     .padding(.top, 12)
@@ -141,8 +140,37 @@ struct HomeView: View {
         }
     }
     
-    private func books(_ books: [UserBook]) -> some View {
+    private func userBooks(_ books: [UserBook]) -> some View {
         ForEach(userBooksViewModel.books) { book in
+            VStack {
+                if let imageUrl = book.image_urls.first, let url = URL(
+                    string: imageUrl
+                ) {
+                    AsyncImage(url: url) { image in
+                        image.resizable()
+                    } placeholder: {
+                        ProgressView()
+                    }
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 125, height: 155)
+                    .clipped()
+                    .cornerRadius(8)
+                    .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 3)
+                } else {
+                    Color.gray
+                        .frame(width: 125, height: 155)
+                        .cornerRadius(8)
+                        .overlay(
+                            Text("No Image")
+                                .foregroundColor(.white)
+                        )
+                }
+            }
+        }
+    }
+    
+    private func exploreBooks(_ books: [UserBook]) -> some View {
+        ForEach(exploreViewModel.books.prefix(5)) { book in
             VStack {
                 if let imageUrl = book.image_urls.first, let url = URL(
                     string: imageUrl

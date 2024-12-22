@@ -96,14 +96,8 @@ struct GenerateStoryView: View {
                             return Alert(
                                 title: Text("Authentication Required"),
                                 message: Text(alertMessage),
-                                primaryButton: .default(Text("Login"), action: {
-                                    Task {
-                                        do {
-                                            try await authenticationViewModel.signInGoogle(profileViewModel: profileViewModel)
-                                        } catch {
-                                            print(error.localizedDescription)
-                                        }
-                                    }
+                                primaryButton: .default(Text("Sign In"), action: {
+                                    showSignInView = true
                                 }),
                                 secondaryButton: .cancel()
                             )
@@ -122,6 +116,11 @@ struct GenerateStoryView: View {
         }
         .background(Color.white)
         .ignoresSafeArea()
+        .sheet(isPresented: $showSignInView) {
+            AuthenticationView(showSignInView: $showSignInView)
+                .presentationDetents([.height(300)])
+                .presentationDragIndicator(.visible)
+        }
         .fullScreenCover(isPresented: $createStory, content: {
             StoryView(viewModel: generateStoryViewModel, selectGenerate: $selectGenerate)
         })
@@ -169,35 +168,51 @@ struct GenerateStoryView: View {
         }
     }
     
-    func proceedToNextPage() {
+    private func proceedToNextPage() {
+        if currentPage == totalPages - 1 {
+            // On the last page, check authentication before generating
+            if Auth.auth().currentUser?.isAnonymous == true {
+                alertType = .authenticationRequired
+                alertMessage = "Please sign in to save your stories"
+                showAlert = true
+            } else {
+                // User is authenticated with SSO, proceed with generation
+                createStory = true
+            }
+        } else {
+            if validateCurrentPage() {
+                currentPage += 1
+            }
+        }
+    }
+    
+    func validateCurrentPage() -> Bool {
         switch currentPage {
         case 0:
             if generateStoryViewModel.keywords.isEmpty || generateStoryViewModel.keywords.count < 3 {
                 alertMessage = "Please provide three keywords."
                 alertType = .insufficientInformation
                 showAlert = true
-            } else {
-                currentPage += 1
+                return false
             }
         case 1:
             if generateStoryViewModel.selectedTheme.isEmpty {
                 alertMessage = "Please select a theme."
                 alertType = .insufficientInformation
                 showAlert = true
-            } else {
-                currentPage += 1
+                return false
             }
         case 2:
             if generateStoryViewModel.selectedDifficulty.isEmpty {
                 alertMessage = "Please select a difficulty level."
                 alertType = .insufficientInformation
                 showAlert = true
-            } else {
-                checkAuthenticationAndGenerateStory()
+                return false
             }
         default:
             break
         }
+        return true
     }
     
     func checkAuthenticationAndGenerateStory() {
