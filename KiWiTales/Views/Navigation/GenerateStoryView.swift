@@ -36,6 +36,7 @@ struct GenerateStoryView: View {
     var body: some View {
         ZStack {
             exitButton
+                .padding(.top, 30)
             
             VStack {
                 OnboardingHeader(
@@ -45,7 +46,7 @@ struct GenerateStoryView: View {
                     totalPages: totalPages
                 )
                 .padding()
-                .padding(.top, 40)
+                .padding(.top, 60)
                 
                 ZStack(alignment: .bottom) {
                     TabView(selection: $currentPage) {
@@ -59,18 +60,20 @@ struct GenerateStoryView: View {
                     .onChange(of: currentPage) { _, newPage in
                         validatePageChange(for: newPage)
                     }
+                    .offset(y:-40)
                     
-                    VStack(spacing: 12) {
+                    VStack(spacing: 10) {
                         Button {
                             withAnimation {
                                 proceedToNextPage()
                             }
                         } label: {
                             Text(currentPage == totalPages - 1 ? "Generate" : "Next")
+                                .nunito(.semiBold, 18)
                                 .foregroundStyle(Color.white)
                                 .padding(8)
-                                .frame(width: 130, height: 40)
-                                .background(RoundedRectangle(cornerRadius: 24).fill(Color.theme.accent))
+                                .frame(width: 130, height: 45)
+                                .background(RoundedRectangle(cornerRadius: 15).fill(Color.theme.accent))
                         }
                         
                         // Back button
@@ -81,10 +84,11 @@ struct GenerateStoryView: View {
                                 }
                             } label: {
                                 Text("Back")
-                                    .foregroundStyle(Color.black)
-                                    .padding(8)
-                                    .frame(width: 130, height: 40)
-                                    .background(RoundedRectangle(cornerRadius: 24).fill(Color.gray.opacity(0.4)))
+                                    .nunito(.semiBold, 18)
+                                    .foregroundStyle(Color.white)
+                                    .padding(6)
+                                    .frame(width: 130, height: 45)
+                                    .background(RoundedRectangle(cornerRadius: 15).fill(Color.gray.opacity(0.4)))
                             }
                         }
                     }
