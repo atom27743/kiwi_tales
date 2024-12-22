@@ -11,12 +11,14 @@ import FirebaseAuth
 
 struct LoadingView: View {
     let message: String
+    let progress: Double
 
     var body: some View {
         VStack {
-            ProgressView()
-                .scaleEffect(1.5)
-                .padding()
+            ProgressView(value: progress, total: 1.0)
+                .progressViewStyle(.linear)
+                .frame(width: 200)
+                .padding(.bottom, 8)
             Text(message)
                 .font(.headline)
                 .foregroundColor(.primary)
@@ -61,35 +63,83 @@ struct ErrorView: View {
     }
 }
 
+struct CoverView: View {
+    let title: String
+    let coverImage: UIImage?
+    let onStart: () -> Void
+    
+    var body: some View {
+        ZStack {
+            if let image = coverImage {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+                    .ignoresSafeArea()
+            }
+            
+            VStack {
+                Spacer()
+                
+                Text(title)
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Material.ultraThinMaterial)
+                    .cornerRadius(15)
+                    .padding(.bottom, 30)
+                
+                Button(action: onStart) {
+                    Text("Start Reading")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(width: 200)
+                        .background(Color.theme.accent)
+                        .cornerRadius(25)
+                        .shadow(radius: 5)
+                }
+                .padding(.bottom, 50)
+            }
+        }
+    }
+}
+
 struct StoryView: View {
     @ObservedObject var viewModel: GenerateStoryViewModel
-    @State private var currentPage: Int = 0
+    @State private var currentPage: Int = -1 // -1 represents cover page
     @State private var dragOffset: CGFloat = .zero
     @State private var currentOffset: CGFloat = .zero
-    @State private var isStoryStarted: Bool = false
     @State private var showCustomAlert: Bool = false
+    @State private var showCover: Bool = true
 
     @Binding var selectGenerate: Bool
 
     var body: some View {
         ZStack {
-            if !isStoryStarted {
-                Button(action: {
-                    isStoryStarted = true
-                }) {
-                    Text("Start Story")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(Capsule().fill(Color.theme.accent))
+            if viewModel.isLoading {
+                ProgressView("Generating your story...")
+                    .padding()
+            } else if let error = viewModel.errorMessage {
+                ErrorView(message: error) {
+                    viewModel.generateStory()
                 }
-                .padding()
-            } else if let segment = viewModel.storySegment {
-                displayGeneratedStory(segment: segment)
+            } else if let segment = viewModel.storySegment, viewModel.isFullyGenerated {
+                if showCover {
+                    CoverView(
+                        title: segment.title,
+                        coverImage: viewModel.generatedImages.first ?? nil,
+                        onStart: { withAnimation { showCover = false } }
+                    )
+                } else {
+                    displayGeneratedStory(segment: segment)
+                }
             }
 
             // Exit Button
             displayExitButton()
+                .padding(.top, 32)
+                .padding()
 
             // Custom Alert
             if showCustomAlert {
@@ -117,6 +167,10 @@ struct StoryView: View {
                 }
             }
         )
+        .onAppear {
+            viewModel.generateStory()
+        }
+        .ignoresSafeArea()
     }
 
     private func resetView() {
@@ -125,7 +179,6 @@ struct StoryView: View {
         viewModel.selectedDifficulty.removeAll()
         viewModel.isCoverImageGenerated = false
         viewModel.generatedImages.removeAll()
-        isStoryStarted = false
         selectGenerate = false
     }
 
@@ -235,57 +288,3 @@ struct StoryView: View {
 #Preview {
     StoryView(viewModel: .init(), selectGenerate: .constant(true))
 }
-
-//struct StoryView: View {
-//    @ObservedObject var viewModel: GenerateStoryViewModel
-//    @State private var currentPage: Int = 0
-//    @State private var isStoryStarted: Bool = false
-//    var userBook: UserBook?
-//    @Binding var selectGenerate: Bool
-//
-//    var body: some View {
-//        VStack {
-//            if !isStoryStarted {
-//                Button("Start Story") {
-//                    isStoryStarted = true
-//                }
-//                .padding()
-//            } else {
-//                if let story = viewModel.storySegment {
-//                    ScrollView {
-//                        VStack {
-//                            Text(story.title)
-//                                .font(.largeTitle)
-//                                .padding()
-//
-//                            ForEach(0..<story.contents.count, id: \.self) { index in
-//                                if let image = viewModel.generatedImages[index] {
-//                                    Image(uiImage: image)
-//                                        .resizable()
-//                                        .scaledToFit()
-//                                        .frame(height: 200)
-//                                }
-//                                Text(story.contents[index].sentence)
-//                                    .padding()
-//                            }
-//
-//                            if viewModel.isSaving {
-//                                ProgressView("Saving...")
-//                            } else if viewModel.isSaved {
-//                                Text("Story Saved!")
-//                                    .foregroundColor(.green)
-//                            } else {
-//                                Button("Save Story") {
-//                                    viewModel.saveStory()
-//                                }
-//                                .padding()
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        .padding()
-//    }
-//}
-
