@@ -34,13 +34,13 @@ struct DashboardView: View {
                         // Background Circles
                         Circle()
                             .fill(Color.yellow)
-                            .frame(width: geo.size.width * 1.3, height: geo.size.width * 1.3)
-                            .position(x: geo.size.width / 2, y: geo.size.height * 0.8)
+                            .frame(width: geo.size.width * 2, height: geo.size.width * 2)
+                            .position(x: geo.size.width / 2, y: geo.size.height * 1)
 
                         Circle()
                             .fill(Color.orange)
-                            .frame(width: geo.size.width * 1.2, height: geo.size.width * 1.2)
-                            .position(x: geo.size.width / 2, y: geo.size.height * 0.8)
+                            .frame(width: geo.size.width * 1.8, height: geo.size.width * 1.8)
+                            .position(x: geo.size.width / 2, y: geo.size.height * 1)
 
                         // Content
                         VStack {
@@ -59,7 +59,9 @@ struct DashboardView: View {
                                 }
                             } else {
                                 Text("No books available")
-                                    .foregroundColor(.gray)
+                                    .nunito(.bold, 28)
+                                    .offset(y:100)
+                                    .foregroundColor(.white)
                             }
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
