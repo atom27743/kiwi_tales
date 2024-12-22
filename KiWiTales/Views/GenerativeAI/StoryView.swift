@@ -65,43 +65,59 @@ struct ErrorView: View {
 
 struct CoverView: View {
     let title: String
+    let theme: String
+    let difficulty: String
     let coverImage: UIImage?
     let onStart: () -> Void
     
     var body: some View {
-        ZStack {
+        VStack(spacing: 20) {
+            Text(title)
+                .font(.largeTitle)
+                .bold()
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+            
+            VStack(spacing: 10) {
+                Text("Theme: \(theme)")
+                    .font(.headline)
+                Text("Reading Level: \(difficulty)")
+                    .font(.subheadline)
+            }
+            .foregroundColor(.secondary)
+            
             if let image = coverImage {
                 Image(uiImage: image)
                     .resizable()
-                    .scaledToFill()
-                    .ignoresSafeArea()
+                    .scaledToFit()
+                    .frame(maxWidth: 300, maxHeight: 300)
+                    .cornerRadius(15)
+                    .shadow(radius: 5)
+                    .padding()
+            } else {
+                Image(systemName: "photo")
+                    .font(.system(size: 100))
+                    .foregroundColor(.gray)
+                    .frame(width: 300, height: 300)
             }
             
-            VStack {
-                Spacer()
-                
-                Text(title)
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Material.ultraThinMaterial)
-                    .cornerRadius(15)
-                    .padding(.bottom, 30)
-                
-                Button(action: onStart) {
-                    Text("Start Reading")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(width: 200)
-                        .background(Color.theme.accent)
-                        .cornerRadius(25)
-                        .shadow(radius: 5)
+            Button {
+                withAnimation {
+                    onStart()
                 }
-                .padding(.bottom, 50)
+            } label: {
+                HStack {
+                    Text("Start Reading")
+                    Image(systemName: "arrow.right")
+                }
+                .padding()
+                .background(Color.accentColor)
+                .foregroundColor(.white)
+                .cornerRadius(10)
             }
+            .padding(.top)
         }
+        .padding()
     }
 }
 
@@ -128,7 +144,9 @@ struct StoryView: View {
                 if showCover {
                     CoverView(
                         title: segment.title,
-                        coverImage: viewModel.generatedImages.first ?? nil,
+                        theme: viewModel.selectedTheme,
+                        difficulty: viewModel.selectedDifficulty,
+                        coverImage: viewModel.generatedImages.first!,
                         onStart: { withAnimation { showCover = false } }
                     )
                 } else {
