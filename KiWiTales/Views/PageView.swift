@@ -47,31 +47,31 @@ struct PageView: View {
                         
                         if let index = firstValidIndex {
                             Text(String(textArray.prefix(index)))
-                                .font(.title2.weight(.semibold))
+                                .nunito(.bold, 22)
                                 .foregroundColor(.white)
                             
                             Text(String(textArray[index]))
-                                .font(.system(size: 48, weight: .bold))
+                                .nunito(.extraBold, 40)
                                 .foregroundColor(.white)
                             
                             Text(String(textArray.dropFirst(index + 1)))
-                                .font(.title2.weight(.semibold))
+                                .nunito(.bold, 22)
                                 .foregroundColor(.white)
                                 .multilineTextAlignment(.leading)
                         } else {
                             Text(text)
-                                .font(.title2.weight(.semibold))
+                                .nunito(.bold, 22)
                                 .foregroundColor(.white)
                                 .multilineTextAlignment(.leading)
                         }
                     }
-                    .padding()
-                    .padding(.horizontal)
+                    .padding(.top, 20)
+                    .padding(.horizontal, 20)
                     .padding(.bottom, 20)
                 }
                 .frame(maxWidth: .infinity)
-                .frame(height: 230)
-                .background(.black.opacity(0.45), in: RoundedRectangle(cornerRadius: 20.0))
+                .frame(height: 260)
+                .background(.black.opacity(0.5), in: RoundedRectangle(cornerRadius: 30.0))
                 .ignoresSafeArea(edges: .bottom)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
