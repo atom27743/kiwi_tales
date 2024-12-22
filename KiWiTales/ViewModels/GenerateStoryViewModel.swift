@@ -23,6 +23,8 @@ class GenerateStoryViewModel: ObservableObject {
     @Published var generatedImages: [UIImage?] = []
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
+    @Published var loadingMessage: String = "Generating your story..."
+    @Published var loadingProgress: Double = 0.0
     
     @Published var isCoverImageGenerated: Bool = false
     @Published var imagesLoadingProgress: Double = 0.0
@@ -35,6 +37,21 @@ class GenerateStoryViewModel: ObservableObject {
     var isFullyGenerated: Bool {
         guard let storySegment = storySegment else { return false }
         return generatedImages.filter { $0 != nil }.count == storySegment.contents.count + 1
+    }
+    
+    private var totalSteps: Int = 0
+    private var completedSteps: Int = 0
+    
+    func updateProgress(message: String? = nil, step: Int = 0) {
+        DispatchQueue.main.async {
+            if let message = message {
+                self.loadingMessage = message
+            }
+            if step > 0 {
+                self.completedSteps += step
+                self.loadingProgress = Double(self.completedSteps) / Double(self.totalSteps)
+            }
+        }
     }
 
     private let model = GenerativeModel(name: "gemini-1.5-pro", apiKey: APIKey.default)
@@ -97,97 +114,26 @@ class GenerateStoryViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
-    func generateStory() {
-        isLoading = true
-        errorMessage = nil
-        storySegment = nil
-        generatedImages.removeAll()
-        isCoverImageGenerated = false
-        imagesLoadingProgress = 0.0
+    private func updateProgress() {
+        let totalImages = Double(generatedImages.count)
+        let loadedImages = Double(generatedImages.compactMap { $0 }.count)
+        imagesLoadingProgress = loadedImages / totalImages
         
-        let prompt = """
-        You are a professional children's story writer. Create a children's story using the three key words \(keywords.joined(separator: ", ")) and theme of \(selectedTheme). The story's difficulty is \(selectedDifficulty) years old, where it should contain \(numSentences) sentences. For each sentence, create a detailed and descriptive prompt (maximum 70 words) that will guide a text2image model to generate a consistent illustration. Output the results in the following JSON format:
-        {
-          "title": "<Title>",
-          "cover_image_prompt": "2d cute cartoon style, children's book illustration, <Cover_Image_Prompt>",
-          "contents": [
-            {
-              "sentence": "<Sentence 1>",
-              "image_prompt": "2d cute cartoon style, children's book illustration, <Image_Prompt 1>"
-            }
-          ]
+        // Only set isLoading to false when all images are loaded and we're fully generated
+        if imagesLoadingProgress >= 1.0 && isFullyGenerated {
+            isLoading = false
         }
-        """
-        
-        Task { [weak self] in
-            guard let self = self else { return }
-            
-            do {
-                let result = try await model.generateContent(prompt)
-                
-                if let responseText = result.text {
-                    print("Raw Response: \(responseText)")
-                    
-                    let cleanedResponse = responseText
-                        .trimmingCharacters(in: .whitespacesAndNewlines)
-                        .replacingOccurrences(of: "```json", with: "")
-                        .replacingOccurrences(of: "```", with: "")
-                    
-                    print("Cleaned Response: \(cleanedResponse)")
-                    
-                    if let data = cleanedResponse.data(using: .utf8) {
-                        do {
-                            let segment = try JSONDecoder().decode(StorySegment.self, from: data)
-                            await MainActor.run {
-                                self.storySegment = segment
-                                self.startImageGeneration(for: segment)
-                            }
-                        } catch {
-                            print("JSON Decoding Error: \(error)")
-                            await MainActor.run {
-                                self.isLoading = false
-                                self.errorMessage = "Failed to decode JSON: \(error.localizedDescription)"
-                            }
-                        }
-                    }
-                }
-            } catch {
-                print("API Error: \(error)")
-                await MainActor.run {
-                    self.isLoading = false
-                    self.errorMessage = "Failed to generate content: \(error.localizedDescription)"
-                }
-            }
-        }
-    }
-    
-    // MARK: - Image Generation
-    
-    private func startImageGeneration(for segment: StorySegment) {
-        let totalImages = segment.contents.count + 1
-        generatedImages = Array(repeating: nil, count: totalImages)
-        
-        // Clear any existing queue and tracking
-        imageGenerationQueue.removeAll()
-        requestTimestamps.removeAll()
-        isProcessingQueue = false
-        
-        // Add cover image to queue with high priority
-        imageGenerationQueue.append((segment.coverImagePrompt, 0))
-        
-        // Add content images to queue
-        for (index, content) in segment.contents.enumerated() {
-            imageGenerationQueue.append((content.imagePrompt, index + 1))
-        }
-        
-        // Start processing queue
-        processImageQueue()
     }
     
     private func processImageQueue() {
         guard !isProcessingQueue, !imageGenerationQueue.isEmpty else {
-            if imageGenerationQueue.isEmpty && isFullyGenerated {
-                self.isLoading = false
+            if imageGenerationQueue.isEmpty {
+                Task { @MainActor in
+                    // Only set isLoading to false if all images are generated
+                    if isFullyGenerated {
+                        self.isLoading = false
+                    }
+                }
             }
             return
         }
@@ -229,6 +175,10 @@ class GenerateStoryViewModel: ObservableObject {
             
             await MainActor.run {
                 self.isProcessingQueue = false
+                // Double check if we're fully generated before setting isLoading to false
+                if self.isFullyGenerated {
+                    self.isLoading = false
+                }
             }
         }
     }
@@ -274,6 +224,90 @@ class GenerateStoryViewModel: ObservableObject {
                 }
                 currentRetry += 1
                 try? await Task.sleep(nanoseconds: UInt64(pow(2.0, Double(currentRetry))) * 1_000_000_000)
+            }
+        }
+    }
+    
+    func generateStory() {
+        isLoading = true
+        errorMessage = nil
+        loadingProgress = 0.0
+        completedSteps = 0
+        generatedImages.removeAll()
+        
+        // Calculate total steps (story + images)
+        totalSteps = numSentences + numSentences + 2 // Story generation + images + cover image
+        
+        Task {
+            do {
+                updateProgress(message: "Creating your story...")
+                let story = try await generateStoryContent()
+                
+                DispatchQueue.main.async {
+                    self.storySegment = story
+                    self.completedSteps += self.numSentences
+                    self.loadingProgress = Double(self.completedSteps) / Double(self.totalSteps)
+                    // Initialize the images array with the correct size
+                    self.generatedImages = Array(repeating: nil, count: story.contents.count + 1)
+                }
+                
+                updateProgress(message: "Bringing your story to life with images...")
+                
+                // Generate cover image first
+                let coverPrompt = "Create a book cover illustration for a children's story titled '\(story.title)' in a whimsical, colorful style"
+                try await generateImage(from: coverPrompt, forIndex: 0)
+                
+                // Generate images for each story segment
+                for (index, content) in story.contents.enumerated() {
+                    let prompt = "Create a children's book illustration for the following scene: \(content.sentence)"
+                    try await generateImage(from: prompt, forIndex: index + 1)
+                }
+                
+                // Set loading to false after all images are generated
+                DispatchQueue.main.async {
+                    self.isLoading = false
+                }
+                
+            } catch {
+                DispatchQueue.main.async {
+                    self.errorMessage = error.localizedDescription
+                    self.isLoading = false
+                }
+            }
+        }
+    }
+    
+    // MARK: - Image Generation
+    
+    private func generateImage(from prompt: String, forIndex index: Int) async throws {
+        let maxRetries = 3
+        var currentRetry = 0
+
+        while currentRetry < maxRetries {
+            do {
+                let image = try await fetchImageWithRetry(prompt: prompt)
+
+                DispatchQueue.main.async {
+                    print("Successfully generated image for index: \(index)")
+                    self.generatedImages[index] = image
+                    self.updateProgress(step: 1)
+                    if index == 0 {
+                        self.isCoverImageGenerated = true
+                    }
+                }
+                return
+            
+            } catch APIError.rateLimited {
+                print("Rate limit hit, implementing exponential backoff...")
+                let backoffSeconds = Int(pow(2.0, Double(currentRetry + 2)))
+                try? await Task.sleep(nanoseconds: UInt64(backoffSeconds) * 1_000_000_000)
+                currentRetry += 1
+            } catch {
+                print("Error generating image: \(error.localizedDescription)")
+                if currentRetry == maxRetries - 1 {
+                    throw error
+                }
+                currentRetry += 1
             }
         }
     }
@@ -386,13 +420,15 @@ class GenerateStoryViewModel: ObservableObject {
         return URLSession(configuration: config)
     }()
     
-    private func updateProgress() {
-        let totalImages = Double(generatedImages.count)
-        let loadedImages = Double(generatedImages.compactMap { $0 }.count)
-        imagesLoadingProgress = loadedImages / totalImages
-        if imagesLoadingProgress >= 1.0 {
-            isLoading = false
-        }
+    private func canMakeRequest() -> Bool {
+        let now = Date()
+        // Remove timestamps older than 1 minute
+        requestTimestamps = requestTimestamps.filter { now.timeIntervalSince($0) < 60 }
+        return requestTimestamps.count < requestsPerMinute
+    }
+    
+    private func trackRequest() {
+        requestTimestamps.append(Date())
     }
     
     func loadSavedStory(from userBook: UserBook) {
@@ -504,70 +540,6 @@ class GenerateStoryViewModel: ObservableObject {
         }
     }
     
-//    func saveStory() {
-//        guard let userID = Auth.auth().currentUser?.uid else {
-//            print("Error: User not authenticated.")
-//            return
-//        }
-//
-//        guard let storySegment = self.storySegment else {
-//            print("Error: No story segment available.")
-//            return
-//        }
-//
-//        let bookID = UUID().uuidString
-//        self.isSaving = true
-//
-//        Task {
-//            do {
-//                // Upload images and generate URLs
-//                var imageURLs: [String] = []
-//
-//                for (index, image) in self.generatedImages.enumerated() {
-//                    if let image = image {
-//                        let imagePath = "books/\(userID)/\(bookID)/images/\(index).jpg"
-//
-//                        let url = try await StorageManager.shared.uploadImage(image: image, path: imagePath)
-//                        imageURLs.append(url.absoluteString)
-//                    } else {
-//                        imageURLs.append("")
-//                    }
-//                }
-//
-//                // Save all data to Firestore
-//                let storyData: [String: Any] = [
-//                    "book_id": bookID,
-//                    "user_id": userID,
-//                    "title": storySegment.title,
-//                    "cover_image_prompt": storySegment.coverImagePrompt,
-//                    "generated_texts": storySegment.contents.map { $0.sentence },
-//                    "image_prompts": storySegment.contents.map { $0.imagePrompt },
-//                    "image_urls": imageURLs,
-//                    "theme": self.selectedTheme,
-//                    "keywords": self.keywords,
-//                    "difficulty": self.selectedDifficulty,
-//                    "num_sentences": self.numSentences,
-//                    "date_created": FieldValue.serverTimestamp()
-//                ]
-//
-//                // Save story data to Firestore
-//                let db = Firestore.firestore()
-//                try await db.collection("books").document(bookID).setData(storyData)
-//
-//                print("Story saved successfully.")
-//                await MainActor.run {
-//                    self.isSaving = false
-//                    self.isSaved = true
-//                }
-//            } catch {
-//                print("Error saving story: \(error.localizedDescription)")
-//                await MainActor.run {
-//                    self.isSaving = false
-//                }
-//            }
-//        }
-//    }
-    
     func saveStory() {
         guard let userID = Auth.auth().currentUser?.uid else {
             print("Error: User not authenticated.")
@@ -632,16 +604,45 @@ class GenerateStoryViewModel: ObservableObject {
         }
     }
 
-    
-    private func canMakeRequest() -> Bool {
-        let now = Date()
-        // Remove timestamps older than 1 minute
-        requestTimestamps = requestTimestamps.filter { now.timeIntervalSince($0) < 60 }
-        return requestTimestamps.count < requestsPerMinute
-    }
-    
-    private func trackRequest() {
-        requestTimestamps.append(Date())
+    private func generateStoryContent() async throws -> StorySegment {
+        let prompt = """
+        You are a professional children's story writer. Create a children's story using the three key words \(keywords.joined(separator: ", ")) and theme of \(selectedTheme). The story's difficulty is \(selectedDifficulty) years old, where it should contain \(numSentences) sentences. For each sentence, create a detailed and descriptive prompt (maximum 70 words) that will guide a text2image model to generate a consistent illustration. Output the results in the following JSON format:
+        {
+          "title": "<Title>",
+          "cover_image_prompt": "2d cute cartoon style, children's book illustration, <Cover_Image_Prompt>",
+          "contents": [
+            {
+              "sentence": "<Sentence 1>",
+              "image_prompt": "2d cute cartoon style, children's book illustration, <Image_Prompt 1>"
+            }
+          ]
+        }
+        """
+        
+        let result = try await model.generateContent(prompt)
+        
+        if let responseText = result.text {
+            print("Raw Response: \(responseText)")
+            
+            let cleanedResponse = responseText
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .replacingOccurrences(of: "```json", with: "")
+                .replacingOccurrences(of: "```", with: "")
+            
+            print("Cleaned Response: \(cleanedResponse)")
+            
+            if let data = cleanedResponse.data(using: .utf8) {
+                do {
+                    let segment = try JSONDecoder().decode(StorySegment.self, from: data)
+                    return segment
+                } catch {
+                    print("JSON Decoding Error: \(error)")
+                    throw APIError.invalidImageData
+                }
+            }
+        }
+        
+        throw APIError.invalidImageData
     }
 }
 
