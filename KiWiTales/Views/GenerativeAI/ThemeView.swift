@@ -24,7 +24,7 @@ struct ThemeView: View {
         ScrollView {
             LazyVGrid(columns: adaptiveColumn, spacing: 20) {
                 ForEach(images) { image in
-                    VStack(spacing: 4) {
+                    VStack(spacing: 2) {
                         Image(uiImage: image.image)
                         Text(image.title.capitalized)
                             .nunito(.semiBold, 24)
@@ -44,8 +44,12 @@ struct ThemeView: View {
                     )
                 }
             }
-            .padding(4)
+            .padding(20)
         }
         .padding()
     }
+}
+
+#Preview {
+    ThemeView(viewModel: .init())
 }

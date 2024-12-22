@@ -28,10 +28,9 @@ struct DifficultyView: View {
         ScrollView {
             VStack {
                 difficultySelectionGrid()
-                
                 informationSection()
             }
-            .padding(4)
+            .padding(20)
         }
         .padding()
     }
@@ -41,6 +40,7 @@ struct DifficultyView: View {
         LazyVGrid(columns: adaptiveColumn, spacing: 20) {
             ForEach(data.indices, id: \.self) { item in
                 difficultyCard(for: item)
+                    .padding([.leading,.trailing],15)
             }
         }
     }
@@ -102,3 +102,6 @@ struct DifficultyView: View {
     }
 }
 
+#Preview {
+    DifficultyView(viewModel: .init())
+}
