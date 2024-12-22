@@ -26,9 +26,10 @@ struct BookStoryView: View {
                 displaySavedStory()
             }
             
-            // Exit button
-            displayExitButton()
-
+            HStack {
+                Spacer()
+                displayExitButton()
+            }
             // Custom Alert
             if showCustomAlert {
                 CustomAlert(showCustomAlert: $showCustomAlert, onSaveAndExit: {
@@ -43,21 +44,25 @@ struct BookStoryView: View {
         .background(
             Group {
                 if let imageURL = book.image_urls[safe: currentPage], let url = URL(string: imageURL) {
-                    AsyncImage(url: url) { phase in
-                        switch phase {
-                        case .success(let image):
-                            image
-                                .resizable()
-                                .scaledToFill()
-                                .blur(radius: 10)
-                                .ignoresSafeArea()
-                        default:
-                            Color.gray.opacity(0.2)
-                                .ignoresSafeArea()
+                    ZStack {
+                        AsyncImage(url: url) { phase in
+                            switch phase {
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .scaledToFill()
+                                    .blur(radius: 10)
+                                    .ignoresSafeArea()
+                            default:
+                                Color.gray.opacity(0.2)
+                                    .ignoresSafeArea()
+                            }
                         }
+                        Color.black.opacity(0.3)
+                        .ignoresSafeArea()
                     }
                 } else {
-                    Color.gray.opacity(0.2)
+                    Color.gray.opacity(0.9)
                         .ignoresSafeArea()
                 }
             }
@@ -73,20 +78,12 @@ struct BookStoryView: View {
 
     @ViewBuilder
     private func displayCoverPage() -> some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 8) {
             Text(book.title)
-                .font(.largeTitle)
-                .bold()
+                .nunito(.extraBold, 36)
+                .foregroundColor(.white)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
-            
-            VStack(spacing: 10) {
-                Text("Theme: \(book.theme)")
-                    .font(.headline)
-                Text("Reading Level: \(book.difficulty)")
-                    .font(.subheadline)
-            }
-            .foregroundColor(.secondary)
             
             if let imageURL = book.image_urls.first, !imageURL.isEmpty, let url = URL(string: imageURL) {
                 AsyncImage(url: url) { phase in
@@ -111,19 +108,28 @@ struct BookStoryView: View {
                 .padding()
             }
             
-            Button {
+            VStack(spacing: 6) {
+                Text("Theme: \(book.theme)")
+                    .nunito(.semiBold, 18)
+                Text("Reading Level: \(book.difficulty)")
+                    .nunito(.semiBold, 18)
+            }
+            .foregroundColor(.white)
+            
+            Button(action: {
                 withAnimation {
                     isStoryStarted = true
                 }
-            } label: {
+            }) {
                 HStack {
                     Text("Start Reading")
                     Image(systemName: "arrow.right")
                 }
+                .font(.nunito(.bold, 18))
                 .padding()
                 .background(Color.accentColor)
                 .foregroundColor(.white)
-                .cornerRadius(10)
+                .cornerRadius(20)
             }
             .padding(.top)
         }
@@ -173,13 +179,14 @@ struct BookStoryView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .foregroundStyle(.white)
-                        .frame(width: 24, height: 24)
-                        .padding(8)
-                        .background(Color.green)
+                        .frame(width: 14, height: 14)
+                        .padding(12)
+                        .background(Color.accentColor)
                         .clipShape(Circle())
+                        .font(.system(size: 18, weight: .bold))
                 }
-                .padding(.bottom, 134)
-                .padding(.trailing, 32)
+                .padding(.bottom, 160)
+                .padding(.trailing, 30)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
             .background(Color.clear)
@@ -188,7 +195,7 @@ struct BookStoryView: View {
         PageIndicator(currentPage: $currentPage, totalPages: book.generated_texts.count)
             .frame(maxHeight: .infinity, alignment: .top)
             .padding(.horizontal, 60)
-            .padding(.top, 76)
+            .padding(.top, 60)
     }
     
     @ViewBuilder
@@ -201,9 +208,11 @@ struct BookStoryView: View {
                 }) {
                     Image(systemName: "xmark.circle.fill")
                         .font(.title)
-                        .foregroundColor(.gray)
-                        .padding()
+                        .foregroundColor(Color.white.opacity(0.8))
+                        .padding(.top, 20)
+                        .padding(.leading, 20)
                 }
+                .scaleEffect(1.2)
                 Spacer()
             }
             Spacer()
