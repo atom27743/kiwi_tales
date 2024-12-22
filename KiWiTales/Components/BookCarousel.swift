@@ -28,7 +28,7 @@ struct BookCarousel: View {
                         coverImage(book: books[index], index: index, geometry: geometry)
                     }
                 }
-                .offset(y: -85) // Shift the entire carousel upwards by 80 points. Adjust this value as needed.
+                .offset(y: -80) // Shift the entire carousel upwards by 80 points. Adjust this value as needed.
                 
                 if selectedIndex < books.count {
                     Text(books[selectedIndex].title)
@@ -38,7 +38,7 @@ struct BookCarousel: View {
                         .lineLimit(nil)
                         .fixedSize(horizontal: false, vertical: true)
                         .padding(.horizontal, 16)
-                        .offset(y: -55)
+                        .offset(y: -35)
                 }
             }
             .gesture(
@@ -87,4 +87,11 @@ struct BookCarousel: View {
             Spacer()
         }
     }
+}
+
+#Preview {
+    @Previewable @State var selectedTab: Tabs = .dashboard
+    @Previewable @State var showMenu: Bool = false
+
+    return DashboardView(selectedTab: $selectedTab, showMenu: $showMenu)
 }
