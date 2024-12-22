@@ -36,7 +36,7 @@ struct CustomNavigationBar: View {
                 Button {
                     selectedTab = .home
                 } label: {
-                    Text("KiWiTales")
+                    Text("KiwiTales")
                         .nunito(.extraBold, 24)
                         .padding(.bottom, 4)
                 }

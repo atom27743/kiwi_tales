@@ -30,7 +30,7 @@ struct CustomNavigationBarHome: View {
                 }
                 .frame(height: 100, alignment: .bottom)
 
-                Text("KiWiTales")
+                Text("KiwiTales")
                     .foregroundStyle(Color.theme.accent)
                     .nunito(.extraBold, 24)
                     .padding(.bottom, 4)
