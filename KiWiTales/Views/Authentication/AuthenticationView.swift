@@ -12,5 +12,6 @@ struct AuthenticationView: View {
     
     var body: some View {
         SignInMethodsView(showSignInView: $showSignInView)
+            .presentationBackground(Color.theme.background)
     }
 }
