@@ -31,7 +31,8 @@ class GenerateStoryViewModel: ObservableObject {
     
     @Published var isSaving: Bool = false
     @Published var isSaved: Bool = false
-
+    @Published var saveProgress: Double = 0.0
+    
     private let db = Firestore.firestore()
     
     var isFullyGenerated: Bool {
@@ -553,11 +554,13 @@ class GenerateStoryViewModel: ObservableObject {
 
         let bookID = UUID().uuidString
         self.isSaving = true
+        self.saveProgress = 0.0
 
         Task {
             do {
                 // Upload images and generate URLs
                 var imageURLs: [String] = []
+                let totalImages = Double(self.generatedImages.count)
 
                 for (index, image) in self.generatedImages.enumerated() {
                     if let image = image {
@@ -565,8 +568,17 @@ class GenerateStoryViewModel: ObservableObject {
 
                         let url = try await StorageManager.shared.uploadImage(image: image, path: imagePath)
                         imageURLs.append(url.absoluteString)
+                        
+                        // Update progress after each image upload
+                        await MainActor.run {
+                            // Images are 90% of the progress, saving data is the last 10%
+                            self.saveProgress = (Double(index + 1) / totalImages) * 0.9
+                        }
                     } else {
                         imageURLs.append("")
+                        await MainActor.run {
+                            self.saveProgress = (Double(index + 1) / totalImages) * 0.9
+                        }
                     }
                 }
 
@@ -579,10 +591,10 @@ class GenerateStoryViewModel: ObservableObject {
                     "generated_texts": storySegment.contents.map { $0.sentence },
                     "image_prompts": storySegment.contents.map { $0.imagePrompt },
                     "image_urls": imageURLs,
-                    "theme": self.selectedTheme,  // Ensure theme is saved
-                    "keywords": self.keywords,    // Ensure keywords are saved
-                    "difficulty": self.selectedDifficulty,  // Ensure difficulty is saved
-                    "num_sentences": self.numSentences,  // Save the number of sentences
+                    "theme": self.selectedTheme,
+                    "keywords": self.keywords,
+                    "difficulty": self.selectedDifficulty,
+                    "num_sentences": self.numSentences,
                     "date_created": FieldValue.serverTimestamp()
                 ]
 
@@ -592,12 +604,14 @@ class GenerateStoryViewModel: ObservableObject {
 
                 print("Story saved successfully.")
                 await MainActor.run {
+                    self.saveProgress = 1.0
                     self.isSaving = false
                     self.isSaved = true
                 }
             } catch {
                 print("Error saving story: \(error.localizedDescription)")
                 await MainActor.run {
+                    self.saveProgress = 0.0
                     self.isSaving = false
                 }
             }

@@ -128,6 +128,11 @@ struct StoryView: View {
     @State private var currentOffset: CGFloat = .zero
     @State private var showCustomAlert: Bool = false
     @State private var showCover: Bool = true
+    @State private var saveButtonOffset: CGFloat = 0
+    @State private var isAnimating: Bool = false
+    @Namespace private var animation
+    
+    private let timer = Timer.publish(every: 6, on: .main, in: .common).autoconnect()
 
     @Binding var selectGenerate: Bool
 
@@ -158,6 +163,8 @@ struct StoryView: View {
             displayExitButton()
                 .padding(.top, 32)
                 .padding()
+                .opacity(viewModel.isSaving ? 0 : 1)
+                .animation(.easeInOut(duration: 0.3), value: viewModel.isSaving)
 
             // Custom Alert
             if showCustomAlert {
@@ -241,32 +248,81 @@ struct StoryView: View {
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .foregroundStyle(.white)
-                            .frame(width: 24, height: 24)
-                            .padding(8)
-                            .background(Color.green)
+                            .frame(width: 14, height: 14)
+                            .padding(12)
+                            .background(Color.theme.accent)
                             .clipShape(Circle())
+                            .matchedGeometryEffect(id: "saveButton", in: animation)
+                            .font(.system(size: 18, weight: .bold))
+                            .padding(.bottom, 24)
                     } else {
                         Button(action: {
                             viewModel.saveStory()
                         }) {
-                            if viewModel.isSaving {
-                                ProgressView()
-                                    .progressViewStyle(.circular)
-                            } else {
-                                Image(systemName: "square.and.arrow.down")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .foregroundStyle(.white)
-                                    .frame(width: 24, height: 24)
-                                    .padding(8)
-                                    .background(Color.accent)
-                                    .clipShape(Circle())
+                            ZStack {
+                                if viewModel.isSaving {
+                                    Circle()
+                                        .stroke(Color.white.opacity(0.2), lineWidth: 4)
+                                        .frame(width: 40, height: 40)
+                                        .overlay(
+                                            Circle()
+                                                .trim(from: 0, to: viewModel.saveProgress)
+                                                .stroke(Color.theme.accent, lineWidth: 4)
+                                                .frame(width: 40, height: 40)
+                                                .rotationEffect(.degrees(-90))
+                                        )
+                                } else {
+                                    Image(systemName: "square.and.arrow.down")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .foregroundStyle(.white)
+                                        .frame(width: 24, height: 24)
+                                        .padding(12)
+                                        .background(Color.accent)
+                                        .clipShape(Circle())
+                                        .font(.system(size: 18, weight: .bold))
+                                }
+                            }
+                            .matchedGeometryEffect(id: "saveButton", in: animation)
+                            .offset(y: saveButtonOffset)
+                        }
+                        .padding(.bottom, 24)
+                        .disabled(viewModel.isSaving)
+                        .onReceive(timer) { _ in
+                            if !viewModel.isSaved && !viewModel.isSaving && !isAnimating {
+                                isAnimating = true
+                                
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    saveButtonOffset = -10
+                                }
+                                
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        saveButtonOffset = 0
+                                    }
+                                    
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                        withAnimation(.easeInOut(duration: 0.3)) {
+                                            saveButtonOffset = -10
+                                        }
+                                        
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                            withAnimation(.easeInOut(duration: 0.3)) {
+                                                saveButtonOffset = 0
+                                                
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                                    isAnimating = false
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
-                .padding(.bottom, 134)
-                .padding(.trailing, 32)
+                .padding(.bottom, 160)
+                .padding(.trailing, 30)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
             .background(Color.clear)
@@ -290,10 +346,28 @@ struct StoryView: View {
                         selectGenerate = false
                     }
                 }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.white)
-                        .font(.system(size: 36))
+                    ZStack {
+                        if viewModel.isSaving {
+                            Circle()
+                                .stroke(Color.white.opacity(0.2), lineWidth: 4)
+                                .frame(width: 40, height: 40)
+                                .overlay(
+                                    Circle()
+                                        .trim(from: 0, to: 0.7)
+                                        .stroke(Color.white, lineWidth: 4)
+                                        .frame(width: 40, height: 40)
+                                        .rotationEffect(.degrees(viewModel.isSaving ? 360 : 0))
+                                        .animation(.linear(duration: 1).repeatForever(autoreverses: false), 
+                                                 value: viewModel.isSaving)
+                                )
+                        } else {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.white)
+                                .font(.system(size: 36))
+                        }
+                    }
                 }
+                .disabled(viewModel.isSaving)
                 .padding()
 
                 Spacer()
