@@ -20,6 +20,7 @@ struct SignInMethodsView: View {
             Text(Auth.auth().currentUser?.isAnonymous == true ? 
                  "Sign in to save your stories" : 
                  "Choose a sign-in method")
+                .foregroundStyle(Color.theme.text)
                 .font(.headline)
                 .padding(.top)
             

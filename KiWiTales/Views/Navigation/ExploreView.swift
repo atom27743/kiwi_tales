@@ -57,6 +57,7 @@ struct ExploreView: View {
                     ForEach(exploreViewModel.booksByTheme.keys.sorted(), id: \.self) { theme in
                         VStack(alignment: .leading) {
                             Text(theme)
+                                .foregroundStyle(Color.theme.text)
                                 .font(.headline)
                                 .padding(.horizontal, 34)
 
