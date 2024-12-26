@@ -47,18 +47,8 @@ final class AuthenticationViewModel: ObservableObject {
     func signInApple() async throws {
         let manager = SignInAppleManager()
         let tokens = try await manager.startSignInWithAppleFlow()
-        
-        if let currentUser = Auth.auth().currentUser {
-            if currentUser.isAnonymous {
-                try await AuthenticationManager.shared.linkApple(tokens: tokens)
-            } else {
-                // Link Apple to existing SSO account
-                try await AuthenticationManager.shared.linkApple(tokens: tokens)
-            }
-        } else {
-            try await AuthenticationManager.shared.signInWithApple(tokens: tokens)
-        }
-        updateProviders()
+        try await AuthenticationManager.shared.signInWithApple(tokens: tokens)
+//        updateProviders()
     }
     
     func signInAnonymously() async throws {
