@@ -21,7 +21,7 @@ struct GoogleSignInResultModel {
 final class SignInGoogleManager {
     @MainActor
     func signIn() async throws -> GoogleSignInResultModel {
-        guard let topVC = Utilities.shared.rootViewController() else {
+        guard let topVC = Utilities.shared.topViewController() else {
             throw URLError(.cannotFindHost)
         }
         
