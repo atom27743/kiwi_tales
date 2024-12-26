@@ -10,26 +10,33 @@ import UIKit
 
 final class Utilities {
     static let shared = Utilities()
-    private init() {}
+    private init() { }
     
     @MainActor
-    func rootViewController(controller: UIViewController? = nil) -> UIViewController? {
-        let controller = controller ?? UIApplication.shared.keyWindow?.rootViewController
+    func topViewController(controller: UIViewController? = nil) -> UIViewController? {
+        let windowScene = UIApplication.shared.connectedScenes
+            .filter { $0.activationState == .foregroundActive }
+            .first as? UIWindowScene
+        
+        let controller = controller ?? windowScene?.windows
+            .filter { $0.isKeyWindow }
+            .first?.rootViewController
         
         if let navigationController = controller as? UINavigationController {
-            return rootViewController(controller: navigationController.visibleViewController)
+            return topViewController(controller: navigationController.visibleViewController)
         }
         
         if let tabController = controller as? UITabBarController {
             if let selected = tabController.selectedViewController {
-                return rootViewController(controller: selected)
+                return topViewController(controller: selected)
             }
         }
         
         if let presented = controller?.presentedViewController {
-            return rootViewController(controller: presented)
+            return topViewController(controller: presented)
         }
         
         return controller
     }
 }
+
