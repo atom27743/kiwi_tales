@@ -5,7 +5,6 @@
 //  Created by Takumi Otsuka on 12/22/24.
 //
 
-
 import Foundation
 import SwiftUI
 import CryptoKit
@@ -32,9 +31,17 @@ struct SignInWithAppleButtonViewRepresentable: UIViewRepresentable {
 }
 
 @MainActor
-final class SignInAppleManager: NSObject {
+final class SignInAppleManager: NSObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
     private var currentNonce: String?
     private var completionHandler: ((Result<SignInWithAppleResult, Error>) -> Void)? = nil
+    
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = scene.windows.first else {
+            fatalError("No window found")
+        }
+        return window
+    }
     
     func startSignInWithAppleFlow() async throws -> SignInWithAppleResult {
         try await withCheckedThrowingContinuation { continuation in
@@ -51,12 +58,11 @@ final class SignInAppleManager: NSObject {
     }
     
     func startSignInWithAppleFlow(completion: @escaping (Result<SignInWithAppleResult, Error>) -> Void) {
-        guard let topVC = Utilities.shared.rootViewController() else {
-            completion(.failure(URLError(.badURL)))
-            return
-        }
+        print("1. Starting Sign In With Apple Flow")
+        
         let nonce = randomNonceString()
         currentNonce = nonce
+        print("3. Generated nonce")
         
         completionHandler = completion
         
@@ -64,11 +70,14 @@ final class SignInAppleManager: NSObject {
         let request = appleIDProvider.createRequest()
         request.requestedScopes = [.fullName, .email]
         request.nonce = sha256(nonce)
+        print("4. Created Apple ID request")
 
         let authorizationController = ASAuthorizationController(authorizationRequests: [request])
         authorizationController.delegate = self
-        authorizationController.presentationContextProvider = topVC
+        authorizationController.presentationContextProvider = self
+        print("5. Set up authorization controller")
         authorizationController.performRequests()
+        print("6. Performed requests")
     }
     
     private func randomNonceString(length: Int = 32) -> String {
@@ -84,14 +93,12 @@ final class SignInAppleManager: NSObject {
         Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
 
         let nonce = randomBytes.map { byte in
-            // Pick a random character from the set, wrapping around if needed.
             charset[Int(byte) % charset.count]
         }
 
         return String(nonce)
     }
     
-    @available(iOS 13, *)
     private func sha256(_ input: String) -> String {
         let inputData = Data(input.utf8)
         let hashedData = SHA256.hash(data: inputData)
@@ -101,34 +108,70 @@ final class SignInAppleManager: NSObject {
 
         return hashString
     }
-}
-
-extension SignInAppleManager: ASAuthorizationControllerDelegate {
+    
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
-        guard
-            let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
-            let appleIDToken = appleIDCredential.identityToken,
-            let idTokenString = String(data: appleIDToken, encoding: .utf8),
-            let nonce = currentNonce else {
+        print("7. Authorization completed")
+        
+        guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
+            print("Error: Failed to get Apple ID Credential")
             completionHandler?(.failure(URLError(.badServerResponse)))
             return
         }
-        let name = appleIDCredential.fullName?.givenName
+        print("8. Got Apple ID Credential")
+        print("Available data from Apple:")
+        print("- User ID: \(appleIDCredential.user)")
+        print("- Full Name: \(String(describing: appleIDCredential.fullName))")
+        print("- Email: \(String(describing: appleIDCredential.email))")
+        
+        guard let appleIDToken = appleIDCredential.identityToken else {
+            print("Error: Failed to get identity token")
+            completionHandler?(.failure(URLError(.badServerResponse)))
+            return
+        }
+        guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
+            print("Error: Failed to decode identity token")
+            completionHandler?(.failure(URLError(.badServerResponse)))
+            return
+        }
+        
+        guard let currentNonce = currentNonce else {
+            print("Error: Invalid state - nonce is missing")
+            completionHandler?(.failure(URLError(.badServerResponse)))
+            return
+        }
+        
+        let name: String? = {
+            if let fullName = appleIDCredential.fullName {
+                return fullName.givenName
+            }
+            return nil
+        }()
+        
         let email = appleIDCredential.email
         
-        let tokens = SignInWithAppleResult(idToken: idTokenString, rawNonce: nonce, name: name, email: email)
-        completionHandler?(.success(tokens))
+        let tokens = SignInWithAppleResult(
+            idToken: idTokenString,
+            rawNonce: currentNonce,
+            name: name,
+            email: email
+        )
+        
+        // Dispatch to main queue to ensure UI updates happen on the main thread
+        DispatchQueue.main.async {
+            self.completionHandler?(.success(tokens))
+        }
     }
-
+    
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        // Handle error.
-        print("Sign in with Apple errored: \(error)")
-        completionHandler?(.failure(URLError(.badServerResponse)))
-    }
-}
-
-extension UIViewController: ASAuthorizationControllerPresentationContextProviding {
-    public func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-        return self.view.window!
+        print("Authorization failed with error: \(error)")
+        print("Error domain: \((error as NSError).domain)")
+        print("Error code: \((error as NSError).code)")
+        print("Error description: \(error.localizedDescription)")
+        if let nsError = error as NSError? {
+            for (key, value) in nsError.userInfo {
+                print("UserInfo - \(key): \(value)")
+            }
+        }
+        completionHandler?(.failure(error))
     }
 }
