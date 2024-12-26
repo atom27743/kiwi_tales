@@ -7,7 +7,6 @@
 
 import Foundation
 import FirebaseAuth
-import FirebaseCore
 
 struct AuthDataResultModel {
     let uid: String
@@ -24,23 +23,14 @@ struct AuthDataResultModel {
 }
 
 enum AuthProviderOption: String {
+    case email = "password"
     case google = "google.com"
     case apple = "apple.com"
 }
 
 final class AuthenticationManager {
     static let shared = AuthenticationManager()
-    
-    private init() {
-        // Firebase Auth persistence is enabled by default
-        // and will maintain the same anonymous user across app restarts
-        do {
-            try Auth.auth().useUserAccessGroup(nil)
-            
-        } catch {
-            print("Error setting up Firebase user access group: \(error)")
-        }
-    }
+    private init() { }
     
     func getAuthenticatedUser() throws -> AuthDataResultModel {
         guard let user = Auth.auth().currentUser else {
@@ -68,8 +58,12 @@ final class AuthenticationManager {
     }
     
     func signOut() throws {
+        // First sign out from Firebase
         try Auth.auth().signOut()
-        UserDefaults.standard.set(false, forKey: "wasSignedInWithSSO")
+        
+        // Clear all authentication related UserDefaults
+        UserDefaults.standard.removeObject(forKey: "wasSignedInWithSSO")
+        UserDefaults.standard.synchronize()
     }
     
     func delete() async throws {
@@ -127,8 +121,44 @@ extension AuthenticationManager {
     
     @discardableResult
     func signInWithApple(tokens: SignInWithAppleResult) async throws -> AuthDataResultModel {
-        let credential = OAuthProvider.credential(withProviderID: AuthProviderOption.apple.rawValue, idToken: tokens.idToken, rawNonce: tokens.rawNonce)
-        return try await signIn(credential: credential)
+        print("Starting Apple Sign In with Firebase...")
+        let credential = OAuthProvider.credential(
+            withProviderID: AuthProviderOption.apple.rawValue,
+            idToken: tokens.idToken,
+            rawNonce: tokens.rawNonce
+        )
+        
+        print("Created OAuth credential")
+        let authDataResult = try await Auth.auth().signIn(with: credential)
+        let authModel = AuthDataResultModel(user: authDataResult.user)
+        print("Successfully signed in with Firebase. User ID: \(authModel.uid)")
+        
+        do {
+            print("Checking for existing user in Firestore...")
+            let existingUser = try await UserManager.shared.getUser(userId: authModel.uid)
+            
+            if existingUser == nil {
+                print("Creating new user in Firestore...")
+                // Create new user with Apple credentials
+                let newUser = DBUser(
+                    userId: authModel.uid,
+                    email: tokens.email,
+                    photoURL: nil,  // Apple doesn't provide photo URL
+                    displayName: tokens.name,
+                    dateCreated: Date()
+                )
+                try await UserManager.shared.createNewUser(user: newUser)
+                print("Successfully created new user in Firestore with email: \(tokens.email ?? "nil") and name: \(tokens.name ?? "nil")")
+            } else {
+                print("Existing user found. Using stored user data.")
+            }
+        } catch {
+            print("Error handling Firestore user: \(error)")
+            throw error
+        }
+        
+        UserDefaults.standard.set(true, forKey: "wasSignedInWithSSO")
+        return authModel
     }
     
     func signIn(credential: AuthCredential) async throws -> AuthDataResultModel {
