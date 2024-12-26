@@ -12,18 +12,13 @@ struct CustomSideNavigationHeader: View {
 
     var body: some View {
         VStack(spacing: 24) {
-            if let imageURL = profileViewModel.user?.photoUrl, let url = URL(string: imageURL) {
-                AsyncImage(url: url) { phase in
-                    switch phase {
-                    case .empty:
-                        ProgressView()
-                    case .success(let image):
+            if let user = profileViewModel.user {
+                if let photoURL = user.photoURL, let url = URL(string: photoURL) {
+                    AsyncImage(url: url) { image in
                         image
                             .resizable()
-                            .aspectRatio(contentMode:
-                                    .fit)
-                            .frame(width:
-                                    80, height: 80)
+                            .scaledToFit()
+                            .frame(width: 80, height: 80)
                             .clipShape(Circle())
                             .background(
                                 Circle()
@@ -37,47 +32,93 @@ struct CustomSideNavigationHeader: View {
                                             .hueGradient()
                                     )
                             )
-                    case .failure:
-                        Image(systemName: "person.circle.fill")
-                            .resizable()
-                            .scaledToFit()
+                    } placeholder: {
+                        Circle()
                             .frame(width: 80, height: 80)
-                    @unknown default:
-                        EmptyView()
+                            .foregroundColor(.gray)
                     }
+                } else if let displayName = user.displayName {
+                    // Show initials avatar when no profile picture is available
+                    ZStack {
+                        Circle()
+                            .fill(displayName.profileColor)
+                            .frame(width: 80, height: 80)
+                            .background(
+                                Circle()
+                                    .stroke(Color(hex: "FFFCF6") ?? .white, lineWidth: 6)
+                                    .background(
+                                        Circle()
+                                            .stroke(
+                                                Color(hex: "DAECED") ?? Color.white,
+                                                lineWidth: 2
+                                            )
+                                            .hueGradient()
+                                    )
+                            )
+                        
+                        Text(displayName.initials)
+                            .font(.system(size: 32, weight: .bold))
+                            .foregroundColor(.white)
+                    }
+                } else {
+                    // Fallback when neither photo nor name is available
+                    Circle()
+                        .fill(Color.gray)
+                        .frame(width: 80, height: 80)
+                        .overlay(
+                            Image(systemName: "person.fill")
+                                .resizable()
+                                .padding(25)
+                                .foregroundColor(.white)
+                        )
+                        .background(
+                            Circle()
+                                .stroke(Color(hex: "FFFCF6") ?? .white, lineWidth: 6)
+                                .background(
+                                    Circle()
+                                        .stroke(
+                                            Color(hex: "DAECED") ?? Color.white,
+                                            lineWidth: 2
+                                        )
+                                        .hueGradient()
+                                )
+                        )
+                }
+                
+                if let displayName = user.displayName {
+                    Text("Welcome, \(displayName)")
+                        .font(.headline)
+                        .foregroundStyle(Color.theme.text)
+                } else {
+                    Text("Welcome!")
+                        .font(.headline)
+                        .foregroundStyle(Color.theme.text)
                 }
             } else {
                 Image("kiwi_profile")
                     .resizable()
-                    .scaledToFit()
+                    .aspectRatio(contentMode: .fit)
                     .frame(width: 80, height: 80)
-            }
-
-            if let name = profileViewModel.user?.name {
-                Text("Hello, \(Text(name).foregroundStyle(Color.theme.accent))")
-                    .font(.title2.weight(.semibold))
-                    .foregroundStyle(Color.theme.text)
-                    .multilineTextAlignment(.center)
-            } else {
+                
                 Text("Welcome!")
-                    .font(.title2.weight(.semibold))
+                    .font(.headline)
                     .foregroundStyle(Color.theme.text)
-                    .multilineTextAlignment(.center)
             }
         }
-        .frame(maxWidth: .infinity)
-        .onAppear {
-            print(
-                "CustomSideNavigationHeader appeared. User: \(profileViewModel.user?.name ?? "No user")"
-            )
-            Task {
-                do {
-                    try await profileViewModel.loadCurrentUser()
-                    print("Profile loaded: \(profileViewModel.user?.name ?? "No user")")
-                } catch {
-                    print("Failed to load current user: \(error.localizedDescription)")
-                }
-            }
+        .task {
+            await loadUserProfile()
+        }
+        .onChange(of: profileViewModel.user?.displayName) { newValue in
+            print("Display name updated: \(newValue ?? "nil")")
+        }
+    }
+    
+    private func loadUserProfile() async {
+        do {
+            try await profileViewModel.loadCurrentUser()
+            print("Profile loaded: \(profileViewModel.user?.displayName ?? "No user")")
+        } catch {
+            print("Failed to load current user: \(error.localizedDescription)")
         }
     }
 }
@@ -86,4 +127,19 @@ struct CustomSideNavigationHeader: View {
     CustomSideNavigationHeader(profileViewModel: .init())
 }
 
-
+fileprivate extension String {
+    var initials: String {
+        let components = self.components(separatedBy: .whitespacesAndNewlines)
+        return components.reduce("") { result, component in
+            guard let first = component.first?.uppercased() else { return result }
+            return result + first
+        }
+    }
+    
+    var profileColor: Color {
+        let colors: [Color] = [.blue, .red, .green, .orange, .purple, .pink, .teal]
+        let hash = abs(self.hashValue)
+        let index = hash % colors.count
+        return colors[index]
+    }
+}
