@@ -15,33 +15,44 @@ final class ProfileViewModel: ObservableObject {
     @Published private(set) var user: DBUser? = nil
     
     var displayName: String? {
-        return user?.name
+        return user?.displayName
     }
     
     func loadCurrentUser() async throws {
-        if let currentUser = Auth.auth().currentUser {
-            let authDataResult = AuthDataResultModel(user: currentUser)
+        let authDataResult = try AuthenticationManager.shared.getAuthenticatedUser()
+        
+        // Explicitly update on the main thread
+        await MainActor.run {
+            self.user = nil // Clear previous user
+        }
+        
+        let fetchedUser = try await UserManager.shared.getUser(userId: authDataResult.uid)
+        
+        // Ensure UI update happens on main thread
+        await MainActor.run {
+            if fetchedUser == nil {
+                print("No user found in Firestore, creating new user...")
+                let newUser = DBUser(auth: authDataResult)
+                Task {
+                    do {
+                        try await UserManager.shared.createNewUser(user: newUser)
+                        self.user = newUser
+                    } catch {
+                        print("Error creating new user: \(error)")
+                    }
+                }
+            } else {
+                self.user = fetchedUser
                 
-            do {
-                let fetchedUser = try await UserManager.shared.getUser(userID: authDataResult.uid)
-                DispatchQueue.main.async {
-                    self.user = fetchedUser
+                if fetchedUser?.email == nil || fetchedUser?.displayName == nil {
+                    print("User profile is incomplete. Consider adding more details.")
                 }
-            } catch {
-                DispatchQueue.main.async {
-                    self.user = nil
-                }
-                print(
-                    "Failed to fetch user data: \(error.localizedDescription)"
-                )
             }
-        } else {
-            print("No current user available in Firebase")
-            DispatchQueue.main.async {
-                self.user = nil
-            }
+            
+            print("Loaded user: \(self.user?.displayName ?? "No display name")")
         }
     }
+
     
     func resetUser() {
         DispatchQueue.main.async {
