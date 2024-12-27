@@ -11,12 +11,12 @@
 			<string>google-sign-in</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.112454833582-0vjn0f6cappcbj18rr11eu7m95367r7f</string>
+				<string>$(GOOGLE_URL_SCHEME)</string>
 			</array>
 		</dict>
 	</array>
 	<key>GIDClientID</key>
-	<string>112454833582-0vjn0f6cappcbj18rr11eu7m95367r7f.apps.googleusercontent.com</string>
+	<string>$(GID_CLIENT_ID)</string>
 	<key>ATOM_ID</key>
 	<string>$(ATOM_ID)</string>
 	<key>ATOM_HUGGINGFACE_TOKEN</key>

@@ -17,3 +17,7 @@ STABILITY_AI_API_KEY = your_stability_ai_api_key_here
 
 // API URLs
 STABILITY_AI_BASE_URL = api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image
+
+// Google Sign In
+GID_CLIENT_ID = your_client_id_here.apps.googleusercontent.com
+GOOGLE_URL_SCHEME = com.googleusercontent.apps.your_client_id_here
