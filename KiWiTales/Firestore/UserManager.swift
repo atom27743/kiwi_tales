@@ -203,6 +203,10 @@ final class UserManager {
         
         try await userDocument(userId: user.userId).setData(data, merge: true)
     }
+    
+    func deleteUser(userId: String) async throws {
+        try await userDocument(userId: userId).delete()
+    }
 }
 
 
