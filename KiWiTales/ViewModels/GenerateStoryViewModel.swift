@@ -625,18 +625,31 @@ class GenerateStoryViewModel: ObservableObject {
     }
 
     private func generateStoryContent() async throws -> StorySegment {
+//        let prompt = """
+//        You are a professional children's story writer. Create a children's story using the three key words \(keywords.joined(separator: ", ")) and theme of \(selectedTheme). The story's difficulty is \(selectedDifficulty) years old, where it should contain \(numSentences) sentences. For each sentence, create a detailed and descriptive prompt (maximum 70 words) that will guide a text2image model to generate a consistent illustration. Output the results in the following JSON format:
+//        {
+//          "title": "<Title>",
+//          "cover_image_prompt": "2d cute cartoon style, children's book illustration, <Cover_Image_Prompt>",
+//          "contents": [
+//            {
+//              "sentence": "<Sentence 1>",
+//              "image_prompt": "2d cute cartoon style, children's book illustration, <Image_Prompt 1>"
+//            }
+//          ]
+//        }
+//        """
         let prompt = """
-        You are a professional children's story writer. Create a children's story using the three key words \(keywords.joined(separator: ", ")) and theme of \(selectedTheme). The story's difficulty is \(selectedDifficulty) years old, where it should contain \(numSentences) sentences. For each sentence, create a detailed and descriptive prompt (maximum 70 words) that will guide a text2image model to generate a consistent illustration. Output the results in the following JSON format:
-        {
-          "title": "<Title>",
-          "cover_image_prompt": "2d cute cartoon style, children's book illustration, <Cover_Image_Prompt>",
-          "contents": [
+            You are a professional children's story writer. Create a children's story using the three key words \(keywords.joined(separator: ", ")) and theme of \(selectedTheme). The story's difficulty is \(selectedDifficulty) years old, where it should contain \(numSentences) sentences. For each sentence, create a highly descriptive and precise prompt using short, specific phrases separated by commas, ensuring consistency in style, color palette, and character design across all images. Include essential details such as subject, setting, lighting, and artistic style to guide Stable Diffusion in generating accurate and high-quality images that align seamlessly throughout the story. Output the results in the following JSON format:
             {
-              "sentence": "<Sentence 1>",
-              "image_prompt": "2d cute cartoon style, children's book illustration, <Image_Prompt 1>"
+              "title": "<Title>",
+              "cover_image_prompt": "2d cute cartoon style, children's book illustration, <Cover_Image_Prompt>, aspect ratio: 9:16",
+              "contents": [
+                {
+                  "sentence": "<Sentence 1>",
+                  "image_prompt": "2d cute cartoon style, children's book illustration, <Image_Prompt 1>, aspect ratio: 9:16"
+                }
+              ]
             }
-          ]
-        }
         """
         
         let result = try await model.generateContent(prompt)
