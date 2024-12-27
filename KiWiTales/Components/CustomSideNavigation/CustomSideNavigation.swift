@@ -15,6 +15,7 @@ struct CustomSideNavigation: View {
     @Binding var selectedTab: Tabs
     @Binding var showMenu: Bool
     @Binding var showSignInView: Bool
+    @State private var showDeleteAlert = false
     
     var body: some View {
         ZStack {
@@ -82,11 +83,9 @@ struct CustomSideNavigation: View {
                                     } label: {
                                         Text("Sign In")
                                             .nunito(.bold, 18)
-                                            .foregroundStyle(.white)
+                                            .foregroundStyle(Color.theme.accent)
                                             .frame(height: 45)
                                             .frame(maxWidth: .infinity)
-                                            .background(.blue)
-                                            .cornerRadius(10)
                                     }
                                     .padding(.horizontal)
                                     .padding(.bottom, 40)
@@ -104,9 +103,43 @@ struct CustomSideNavigation: View {
                                     } label: {
                                         Text("Sign Out")
                                             .nunito(.bold, 18)
-                                            .foregroundStyle(.red)
+                                            .foregroundStyle(Color.theme.accent)
+                                            .frame(height: 45)
+                                            .frame(maxWidth: .infinity)
                                     }
+                                    .padding(.horizontal)
+                                    
+                                    Button {
+                                        showDeleteAlert = true
+                                    } label: {
+                                        Text("Delete Account")
+                                            .nunito(.bold, 18)
+                                            .foregroundStyle(Color.red)
+                                            .frame(height: 45)
+                                            .frame(maxWidth: .infinity)
+                                    }
+                                    .padding(.horizontal)
                                     .padding(.bottom, 40)
+                                    .alert("Delete Account", isPresented: $showDeleteAlert) {
+                                        Button("Cancel", role: .cancel) { }
+                                        Button("Delete", role: .destructive) {
+                                            Task {
+                                                do {
+                                                    showMenu = false
+                                                    // Delete user data from Firestore
+                                                    try await UserManager.shared.deleteUser(userId: user.uid)
+                                                    // Delete user authentication
+                                                    try await AuthenticationManager.shared.delete()
+                                                    // Sign in anonymously after deletion
+                                                    try await viewModel.signInAnonymously()
+                                                } catch {
+                                                    print("Error deleting account: \(error)")
+                                                }
+                                            }
+                                        }
+                                    } message: {
+                                        Text("Are you sure you want to delete your account? This action cannot be undone.")
+                                    }
                                 }
                             }
                         }
