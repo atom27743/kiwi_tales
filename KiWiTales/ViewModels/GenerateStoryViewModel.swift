@@ -55,7 +55,7 @@ class GenerateStoryViewModel: ObservableObject {
         }
     }
 
-    private let model = GenerativeModel(name: "gemini-1.5-pro", apiKey: APIKey.default)
+    private let model = GenerativeModel(name: "gemini-1.5-pro", apiKey: Bundle.main.infoDictionary?["GOOGLE_GEMINI_API_KEY"] as? String ?? "")
     private var cancellables = Set<AnyCancellable>()
     
     private var imageGenerationQueue: [(prompt: String, index: Int)] = []
@@ -314,16 +314,22 @@ class GenerateStoryViewModel: ObservableObject {
     }
     
     private func fetchImageWithRetry(prompt: String) async throws -> UIImage {
-        let apiUrl = "https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image"
-        guard let url = URL(string: apiUrl) else {
+        let apiUrl = Bundle.main.infoDictionary?["STABILITY_AI_BASE_URL"] as? String ?? ""
+        print("Debug - API URL from config: \(apiUrl)")
+        
+        // Ensure URL has proper scheme
+        let urlString = apiUrl.hasPrefix("https://") ? apiUrl : "https://\(apiUrl)"
+        print("Debug - Formatted URL: \(urlString)")
+        
+        guard let url = URL(string: urlString) else {
+            print("Debug - Failed to create URL from: \(urlString)")
             throw APIError.invalidURL
         }
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue("Bearer sk-USRwCvotrQDXzj1hOZjLLdVGq6j1lpcN8ZFdT8ZPPYaWe97o", forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(Bundle.main.infoDictionary?["STABILITY_AI_API_KEY"] as? String ?? "")", forHTTPHeaderField: "Authorization")
         request.timeoutInterval = 30
         
         let requestBody: [String: Any] = [

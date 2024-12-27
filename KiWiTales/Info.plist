@@ -23,6 +23,12 @@
 	<string>$(ATOM_HUGGINGFACE_TOKEN)</string>
 	<key>PERSONAL_HUGGINGFACE_TOKEN</key>
 	<string>$(PERSONAL_HUGGINGFACE_TOKEN)</string>
+	<key>GOOGLE_GEMINI_API_KEY</key>
+	<string>$(GOOGLE_GEMINI_API_KEY)</string>
+	<key>STABILITY_AI_API_KEY</key>
+	<string>$(STABILITY_AI_API_KEY)</string>
+	<key>STABILITY_AI_BASE_URL</key>
+	<string>$(STABILITY_AI_BASE_URL)</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Nunito-Black.ttf</string>

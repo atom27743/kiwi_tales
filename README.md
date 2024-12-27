@@ -33,8 +33,40 @@ KiWiTales is an innovative iOS application that brings the magic of storytelling
 ## Installation
 1. Clone the repository
 2. Install dependencies
-3. Configure Firebase credentials
-4. Build and run the project
+3. Set up configuration files:
+   - Copy `Development.xcconfig.template` to `Development.xcconfig`
+   - Copy `GenerativeAI-Info.template.plist` to `GenerativeAI-Info.plist`
+   - Copy `GoogleService-Info.template.plist` to `GoogleService-Info.plist`
+4. Configure API keys and credentials:
+   - In `Development.xcconfig`:
+     - Add your Google Gemini API key
+     - Add your Stability AI API key
+     - Add your HuggingFace tokens
+   - In `GenerativeAI-Info.plist`:
+     - Add your Google Gemini API key
+   - In `GoogleService-Info.plist`:
+     - Replace with your Firebase configuration file from Firebase Console
+5. Build and run the project
+
+## Required API Keys
+To run KiWiTales, you'll need the following API keys:
+
+### Google Gemini AI
+- Sign up at [Google AI Studio](https://ai.google.dev/)
+- Create an API key for Gemini Pro
+
+### Stability AI
+- Sign up at [Stability AI](https://platform.stability.ai/)
+- Create an API key for image generation
+
+### Firebase
+- Create a project in [Firebase Console](https://console.firebase.google.com/)
+- Add an iOS app to your project
+- Download the `GoogleService-Info.plist` configuration file
+
+### HuggingFace (Optional)
+- Sign up at [HuggingFace](https://huggingface.co/)
+- Create an API token
 
 ## Architecture
 The app follows a clean MVVM (Model-View-ViewModel) architecture with:
