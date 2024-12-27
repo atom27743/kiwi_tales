@@ -37,7 +37,7 @@ struct CustomSideNavigationHeader: View {
                             .frame(width: 80, height: 80)
                             .foregroundColor(.gray)
                     }
-                } else if let displayName = user.displayName {
+                } else if let displayName = user.name {
                     // Show initials avatar when no profile picture is available
                     ZStack {
                         Circle()
@@ -66,10 +66,10 @@ struct CustomSideNavigationHeader: View {
                         .fill(Color.gray)
                         .frame(width: 80, height: 80)
                         .overlay(
-                            Image(systemName: "person.fill")
+                            Image("kiwi_profile")
                                 .resizable()
-                                .padding(25)
-                                .foregroundColor(.white)
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 80, height: 80)
                         )
                         .background(
                             Circle()
@@ -85,8 +85,8 @@ struct CustomSideNavigationHeader: View {
                         )
                 }
                 
-                if let displayName = user.displayName {
-                    Text("Welcome, \(displayName)")
+                if let displayName = user.name {
+                    Text("Hello, \(displayName)")
                         .font(.headline)
                         .foregroundStyle(Color.theme.text)
                 } else {
@@ -108,7 +108,7 @@ struct CustomSideNavigationHeader: View {
         .task {
             await loadUserProfile()
         }
-        .onChange(of: profileViewModel.user?.displayName) { newValue in
+        .onChange(of: profileViewModel.user?.name) { newValue in
             print("Display name updated: \(newValue ?? "nil")")
         }
     }
@@ -116,7 +116,7 @@ struct CustomSideNavigationHeader: View {
     private func loadUserProfile() async {
         do {
             try await profileViewModel.loadCurrentUser()
-            print("Profile loaded: \(profileViewModel.user?.displayName ?? "No user")")
+            print("Profile loaded: \(profileViewModel.user?.name ?? "No user")")
         } catch {
             print("Failed to load current user: \(error.localizedDescription)")
         }

@@ -9,29 +9,28 @@
 import Foundation
 import FirebaseFirestore
 
-
 struct DBUser: Codable, Equatable {
     let userId: String
     let email: String?
     let photoURL: String?
-    let displayName: String?
+    let name: String?
     let dateCreated: Date?
     var isFirstTimeUser: Bool? // This is not encoded/decoded by default
 
-    init(auth: AuthDataResultModel, displayName: String? = nil, isFirstTimeUser: Bool? = true) {
+    init(auth: AuthDataResultModel, name: String? = nil, isFirstTimeUser: Bool? = true) {
         self.userId = auth.uid
         self.email = auth.email
         self.photoURL = auth.photoURL
-        self.displayName = displayName
+        self.name = name
         self.dateCreated = Date()
         self.isFirstTimeUser = isFirstTimeUser
     }
 
-    init(userId: String, email: String?, photoURL: String?, displayName: String?, dateCreated: Date?, isFirstTimeUser: Bool? = true) {
+    init(userId: String, email: String?, photoURL: String?, name: String?, dateCreated: Date?, isFirstTimeUser: Bool? = true) {
         self.userId = userId
         self.email = email
         self.photoURL = photoURL
-        self.displayName = displayName
+        self.name = name
         self.dateCreated = dateCreated
         self.isFirstTimeUser = isFirstTimeUser
     }
@@ -40,7 +39,7 @@ struct DBUser: Codable, Equatable {
         case userId = "user_id"
         case email = "email"
         case photoURL = "photo_url"
-        case displayName = "display_name"
+        case name = "name"
         case dateCreated = "date_created"
         case isFirstTimeUser = "is_first_time_user" // Explicitly define it for Codable
     }
@@ -51,7 +50,7 @@ struct DBUser: Codable, Equatable {
         self.userId = try container.decode(String.self, forKey: .userId)
         self.email = try container.decodeIfPresent(String.self, forKey: .email)
         self.photoURL = try container.decodeIfPresent(String.self, forKey: .photoURL)
-        self.displayName = try container.decodeIfPresent(String.self, forKey: .displayName)
+        self.name = try container.decodeIfPresent(String.self, forKey: .name)
         self.dateCreated = try container.decodeIfPresent(Date.self, forKey: .dateCreated)
         self.isFirstTimeUser = try container.decodeIfPresent(Bool.self, forKey: .isFirstTimeUser)
     }
@@ -62,7 +61,7 @@ struct DBUser: Codable, Equatable {
         try container.encode(userId, forKey: .userId)
         try container.encodeIfPresent(email, forKey: .email)
         try container.encodeIfPresent(photoURL, forKey: .photoURL)
-        try container.encodeIfPresent(displayName, forKey: .displayName)
+        try container.encodeIfPresent(name, forKey: .name)
         try container.encodeIfPresent(dateCreated, forKey: .dateCreated)
         try container.encodeIfPresent(isFirstTimeUser, forKey: .isFirstTimeUser)
     }
@@ -72,7 +71,7 @@ struct DBUser: Codable, Equatable {
         return lhs.userId == rhs.userId &&
                lhs.email == rhs.email &&
                lhs.photoURL == rhs.photoURL &&
-               lhs.displayName == rhs.displayName
+               lhs.name == rhs.name
     }
 }
 
@@ -145,7 +144,7 @@ final class UserManager {
             DBUser.CodingKeys.userId.rawValue: user.userId,
             DBUser.CodingKeys.email.rawValue: user.email as Any,
             DBUser.CodingKeys.photoURL.rawValue: user.photoURL as Any,
-            DBUser.CodingKeys.displayName.rawValue: user.displayName as Any,
+            DBUser.CodingKeys.name.rawValue: user.name as Any,
             DBUser.CodingKeys.dateCreated.rawValue: user.dateCreated as Any
         ]
         
@@ -168,13 +167,13 @@ final class UserManager {
         let userId = data[DBUser.CodingKeys.userId.rawValue] as? String ?? ""
         let email = data[DBUser.CodingKeys.email.rawValue] as? String
         let photoURL = data[DBUser.CodingKeys.photoURL.rawValue] as? String
-        let displayName = data[DBUser.CodingKeys.displayName.rawValue] as? String
+        let name = data[DBUser.CodingKeys.name.rawValue] as? String
         let dateCreated = (data[DBUser.CodingKeys.dateCreated.rawValue] as? Timestamp)?.dateValue()
         
         return DBUser(userId: userId,
                      email: email,
                      photoURL: photoURL,
-                     displayName: displayName,
+                     name: name,
                      dateCreated: dateCreated)
     }
     
@@ -187,7 +186,7 @@ final class UserManager {
     
     func updateDisplayName(userId: String, displayName: String) async throws {
         let data: [String: Any] = [
-            DBUser.CodingKeys.displayName.rawValue : displayName
+            DBUser.CodingKeys.name.rawValue : displayName
         ]
         try await userDocument(userId: userId).updateData(data)
     }
@@ -197,7 +196,7 @@ final class UserManager {
             DBUser.CodingKeys.userId.rawValue: user.userId,
             DBUser.CodingKeys.email.rawValue: user.email as Any,
             DBUser.CodingKeys.photoURL.rawValue: user.photoURL as Any,
-            DBUser.CodingKeys.displayName.rawValue: user.displayName as Any,
+            DBUser.CodingKeys.name.rawValue: user.name as Any,
             DBUser.CodingKeys.dateCreated.rawValue: user.dateCreated as Any
         ]
 

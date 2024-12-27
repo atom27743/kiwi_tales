@@ -10,13 +10,6 @@ import SwiftUI
 import CryptoKit
 import AuthenticationServices
 
-struct SignInWithAppleResult {
-    let idToken: String
-    let rawNonce: String
-    let name: String?
-    let email: String?
-}
-
 struct SignInWithAppleButtonViewRepresentable: UIViewRepresentable {
     let authorizationButtonType: ASAuthorizationAppleIDButton.ButtonType
     let authorizationButtonStyle: ASAuthorizationAppleIDButton.Style

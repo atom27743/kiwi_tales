@@ -15,7 +15,7 @@ final class ProfileViewModel: ObservableObject {
     @Published private(set) var user: DBUser? = nil
     
     var displayName: String? {
-        return user?.displayName
+        return user?.name
     }
     
     func loadCurrentUser() async throws {
@@ -44,12 +44,12 @@ final class ProfileViewModel: ObservableObject {
             } else {
                 self.user = fetchedUser
                 
-                if fetchedUser?.email == nil || fetchedUser?.displayName == nil {
+                if fetchedUser?.email == nil || fetchedUser?.name == nil {
                     print("User profile is incomplete. Consider adding more details.")
                 }
             }
             
-            print("Loaded user: \(self.user?.displayName ?? "No display name")")
+            print("Loaded user: \(self.user?.name ?? "No display name")")
         }
     }
 

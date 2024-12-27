@@ -144,7 +144,7 @@ extension AuthenticationManager {
                     userId: authModel.uid,
                     email: tokens.email,
                     photoURL: nil,  // Apple doesn't provide photo URL
-                    displayName: tokens.name,
+                    name: tokens.name,
                     dateCreated: Date()
                 )
                 try await UserManager.shared.createNewUser(user: newUser)
