@@ -388,15 +388,6 @@ class GenerateStoryViewModel: ObservableObject {
         }
 
         
-        
-//        let apiUrl = "https://api.stability.ai/v2beta/stable-image/generate/sd3"
-//        print("Debug - API URL: \(apiUrl)")
-//        
-//        guard let url = URL(string: apiUrl) else {
-//            print("Debug - Failed to create URL from: \(apiUrl)")
-//            throw APIError.invalidURL
-//        }
-        
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("Bearer \(Bundle.main.infoDictionary?["STABILITY_AI_API_KEY"] as? String ?? "")", forHTTPHeaderField: "Authorization")
@@ -456,115 +447,6 @@ class GenerateStoryViewModel: ObservableObject {
         return body.data(using: .utf8) ?? Data()
     }
     
-    
-
-
-
-    
-    
-//    private func fetchImageWithRetry(prompt: String) async throws -> UIImage {
-//        let apiUrl = Bundle.main.infoDictionary?["STABILITY_AI_BASE_URL"] as? String ?? ""
-//        print("Debug - API URL from config: \(apiUrl)")
-//        
-//        // Ensure URL has proper scheme
-//        let urlString = apiUrl.hasPrefix("https://") ? apiUrl : "https://\(apiUrl)"
-//        print("Debug - Formatted URL: \(urlString)")
-//        
-//        guard let url = URL(string: urlString) else {
-//            print("Debug - Failed to create URL from: \(urlString)")
-//            throw APIError.invalidURL
-//        }
-//        
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "POST"
-//        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-//        request.setValue("Bearer \(Bundle.main.infoDictionary?["STABILITY_AI_API_KEY"] as? String ?? "")", forHTTPHeaderField: "Authorization")
-//        request.timeoutInterval = 30
-//        
-//        let requestBody: [String: Any] = [
-//            "text_prompts": [
-//                [
-//                    "text": "children's book illustration, \(prompt)",
-//                    "weight": 1
-//                ]
-//            ],
-//            "cfg_scale": 7,
-//            "height": 576,
-//            "width": 1024,
-//            "samples": 1,
-//            "steps": 40,
-//            "style_preset": "enhance"
-//        ]
-//
-//        request.httpBody = try JSONSerialization.data(withJSONObject: requestBody)
-//        
-//        do {
-//            let config = URLSessionConfiguration.default
-//            config.timeoutIntervalForRequest = 30
-//            config.timeoutIntervalForResource = 300
-//            let session = URLSession(configuration: config)
-//            
-//            let (data, response) = try await session.data(for: request)
-//            
-//            guard let httpResponse = response as? HTTPURLResponse else {
-//                throw APIError.invalidResponse
-//            }
-//            
-//            print("Response status code: \(httpResponse.statusCode)")
-//            
-//            if let responseString = String(data: data, encoding: .utf8) {
-//                print("Response data: \(responseString)")
-//            }
-//            
-//            switch httpResponse.statusCode {
-//            case 200...299:
-//                do {
-//                    guard let jsonResponse = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-//                          let artifacts = jsonResponse["artifacts"] as? [[String: Any]],
-//                          let firstImage = artifacts.first?["base64"] as? String else {
-//                        print("Failed to parse JSON response")
-//                        throw APIError.invalidImageData
-//                    }
-//                    
-//                    guard let imageData = Data(base64Encoded: firstImage) else {
-//                        print("Failed to decode base64 image data")
-//                        throw APIError.invalidImageData
-//                    }
-//                    
-//                    guard let image = UIImage(data: imageData) else {
-//                        print("Failed to create UIImage from data")
-//                        throw APIError.invalidImageData
-//                    }
-//                    
-//                    return image
-//                } catch {
-//                    print("Error processing response: \(error)")
-//                    throw APIError.invalidImageData
-//                }
-//                
-//            case 400:
-//                throw APIError.invalidRequest(message: String(data: data, encoding: .utf8) ?? "Bad Request")
-//                
-//            case 401:
-//                throw APIError.invalidRequest(message: "Invalid API key or unauthorized access")
-//                
-//            case 404:
-//                throw APIError.invalidRequest(message: "API endpoint not found. Please check the URL.")
-//                
-//            case 429:
-//                throw APIError.rateLimited
-//                
-//            case 500...599:
-//                throw APIError.serverError(statusCode: httpResponse.statusCode)
-//                
-//            default:
-//                throw APIError.serverError(statusCode: httpResponse.statusCode)
-//            }
-//        } catch {
-//            print("Network error: \(error)")
-//            throw APIError.networkError(error)
-//        }
-//    }
     
     // Add a custom URLSession configuration
     private lazy var imageSession: URLSession = {
