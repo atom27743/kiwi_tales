@@ -254,7 +254,7 @@ struct StoryView: View {
                             .clipShape(Circle())
                             .matchedGeometryEffect(id: "saveButton", in: animation)
                             .font(.system(size: 18, weight: .bold))
-                            .padding(.bottom, 24)
+//                            .padding(.bottom, 24)
                     } else {
                         Button(action: {
                             viewModel.saveStory()
@@ -321,7 +321,7 @@ struct StoryView: View {
                         }
                     }
                 }
-                .padding(.bottom, 160)
+                .padding(.bottom, 170)
                 .padding(.trailing, 30)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
@@ -331,7 +331,7 @@ struct StoryView: View {
         PageIndicator(currentPage: $currentPage, totalPages: segment.contents.count)
             .frame(maxHeight: .infinity, alignment: .top)
             .padding(.horizontal, 60)
-            .padding(.top, 76)
+            .padding(.top, 100)
     }
 
     @ViewBuilder
@@ -362,8 +362,10 @@ struct StoryView: View {
                                 )
                         } else {
                             Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(.white)
-                                .font(.system(size: 36))
+                                .foregroundColor(Color.white.opacity(0.8))
+                                .font(.system(size: 38))
+                                .padding(.top, 20)
+                                .padding(.leading, 20)
                         }
                     }
                 }

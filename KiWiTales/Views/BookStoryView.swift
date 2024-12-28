@@ -185,7 +185,7 @@ struct BookStoryView: View {
                         .clipShape(Circle())
                         .font(.system(size: 18, weight: .bold))
                 }
-                .padding(.bottom, 160)
+                .padding(.bottom, 170)
                 .padding(.trailing, 30)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
@@ -195,7 +195,7 @@ struct BookStoryView: View {
         PageIndicator(currentPage: $currentPage, totalPages: book.generated_texts.count)
             .frame(maxHeight: .infinity, alignment: .top)
             .padding(.horizontal, 60)
-            .padding(.top, 60)
+            .padding(.top, 80)
     }
     
     @ViewBuilder
