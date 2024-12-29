@@ -255,12 +255,13 @@ class GenerateStoryViewModel: ObservableObject {
                 updateProgress(message: "Bringing your story to life with images...")
                 
                 // Generate cover image first
-                let coverPrompt = "Create a book cover illustration for a children's story titled '\(story.title)' in a whimsical, colorful style"
-                try await generateImage(from: coverPrompt, forIndex: 0)
+//                let coverPrompt = "Create a children's picture book cover for '\(story.title)' in a 2d cute cartoon style."
+//                let coverPrompt = "\(story.coverImagePrompt)"
+                try await generateImage(from: story.coverImagePrompt, forIndex: 0)
                 
                 // Generate images for each story segment
                 for (index, content) in story.contents.enumerated() {
-                    let prompt = "\(content.sentence)"
+                    let prompt = "\(content.imagePrompt)"
                     try await generateImage(from: prompt, forIndex: index + 1)
                 }
                 
@@ -373,7 +374,8 @@ class GenerateStoryViewModel: ObservableObject {
     
     
     private func fetchImageWithRetry(prompt: String) async throws -> UIImage {
-        
+        print("Final prompt sent to API: \(prompt)")
+        //to check what prompt is being sent out
         
         let apiUrl = Bundle.main.infoDictionary?["STABILITY_AI_BASE_URL"] as? String ?? ""
         print("Debug - API URL: \(apiUrl)")
@@ -395,6 +397,9 @@ class GenerateStoryViewModel: ObservableObject {
         
         let requestBody: [String: Any] = [
             "prompt": prompt,
+            "aspect_ratio": "9:16",
+            "model": "sd3-large",
+            "negative_prompt": "Realistic image, Photorealistic, Hyper-realistic, Cinematic, 3D render,  HDR, Fine details, Sharp focus, Glossy, Low res, Blurry, Bad anatomy, Bad proportions, Disfigured, Deformed, High realism",
             "output_format": "jpeg"
         ]
         
@@ -657,14 +662,14 @@ class GenerateStoryViewModel: ObservableObject {
 
     private func generateStoryContent() async throws -> StorySegment {
         let prompt = """
-        You are a professional children's story writer. Create a children's story using the three key words \(keywords.joined(separator: ", ")) and theme of \(selectedTheme). The story's difficulty is \(selectedDifficulty) years old, where it should contain \(numSentences) sentences. For each sentence, create a highly descriptive and precise prompt using short, specific phrases separated by commas, ensuring consistency in style, color palette, and character design across all images. Include essential details such as subject, setting, lighting, and artistic style to guide Stable Diffusion in generating accurate and high-quality images that align seamlessly throughout the story. Output the results in the following JSON format:
+        You are a professional children's story writer. Create a fun and appropriate children's story using the three key words \(keywords.joined(separator: ", ")) and theme of \(selectedTheme). The story's difficulty is \(selectedDifficulty) years old, where it should contain \(numSentences) sentences. For each sentence, create a  descriptive and easy to understand natural language prompts ensuring consistency in illustration style, color palette, and character design across all images. Output the results in the following JSON format:
         {
           "title": "<Title>",
-          "cover_image_prompt": "2d cute cartoon style, children's book illustration, <Cover_Image_Prompt>",
+          "cover_image_prompt": "Children's book illustration, Watercolor illustration style, <Cover_Image_Prompt>",
           "contents": [
             {
               "sentence": "<Sentence 1>",
-              "image_prompt": "2d cute cartoon style, <Image_Prompt 1>"
+              "image_prompt": "Children's book illustration, Watercolor illustration style, <Image_Prompt 1>"
             }
           ]
         }
