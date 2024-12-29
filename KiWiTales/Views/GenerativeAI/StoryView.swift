@@ -248,13 +248,13 @@ struct StoryView: View {
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .foregroundStyle(.white)
-                            .frame(width: 14, height: 14)
+                            .frame(width: 16, height: 16)
                             .padding(12)
                             .background(Color.theme.accent)
                             .clipShape(Circle())
                             .matchedGeometryEffect(id: "saveButton", in: animation)
                             .font(.system(size: 18, weight: .bold))
-//                            .padding(.bottom, 24)
+                            .padding(.bottom, 24)
                     } else {
                         Button(action: {
                             viewModel.saveStory()
@@ -263,12 +263,12 @@ struct StoryView: View {
                                 if viewModel.isSaving {
                                     Circle()
                                         .stroke(Color.white.opacity(0.2), lineWidth: 4)
-                                        .frame(width: 40, height: 40)
+                                        .frame(width: 28, height: 28)
                                         .overlay(
                                             Circle()
                                                 .trim(from: 0, to: viewModel.saveProgress)
                                                 .stroke(Color.theme.accent, lineWidth: 4)
-                                                .frame(width: 40, height: 40)
+                                                .frame(width: 28, height: 28)
                                                 .rotationEffect(.degrees(-90))
                                         )
                                 } else {
@@ -276,7 +276,7 @@ struct StoryView: View {
                                         .resizable()
                                         .aspectRatio(contentMode: .fit)
                                         .foregroundStyle(.white)
-                                        .frame(width: 24, height: 24)
+                                        .frame(width: 20, height: 20)
                                         .padding(12)
                                         .background(Color.accent)
                                         .clipShape(Circle())
@@ -331,7 +331,7 @@ struct StoryView: View {
         PageIndicator(currentPage: $currentPage, totalPages: segment.contents.count)
             .frame(maxHeight: .infinity, alignment: .top)
             .padding(.horizontal, 60)
-            .padding(.top, 100)
+            .padding(.top, 120)
     }
 
     @ViewBuilder
@@ -364,8 +364,8 @@ struct StoryView: View {
                             Image(systemName: "xmark.circle.fill")
                                 .foregroundColor(Color.white.opacity(0.8))
                                 .font(.system(size: 38))
-                                .padding(.top, 20)
-                                .padding(.leading, 20)
+//                                .padding(.top, 10)
+//                                .padding(.leading, 20)
                         }
                     }
                 }
