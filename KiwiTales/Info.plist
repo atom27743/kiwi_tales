@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>ATOM_HUGGINGFACE_TOKEN</key>
+	<string>$(ATOM_HUGGINGFACE_TOKEN)</string>
+	<key>ATOM_ID</key>
+	<string>$(ATOM_ID)</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -17,14 +21,10 @@
 	</array>
 	<key>GIDClientID</key>
 	<string>$(GID_CLIENT_ID)</string>
-	<key>ATOM_ID</key>
-	<string>$(ATOM_ID)</string>
-	<key>ATOM_HUGGINGFACE_TOKEN</key>
-	<string>$(ATOM_HUGGINGFACE_TOKEN)</string>
-	<key>PERSONAL_HUGGINGFACE_TOKEN</key>
-	<string>$(PERSONAL_HUGGINGFACE_TOKEN)</string>
 	<key>GOOGLE_GEMINI_API_KEY</key>
 	<string>$(GOOGLE_GEMINI_API_KEY)</string>
+	<key>PERSONAL_HUGGINGFACE_TOKEN</key>
+	<string>$(PERSONAL_HUGGINGFACE_TOKEN)</string>
 	<key>STABILITY_AI_API_KEY</key>
 	<string>$(STABILITY_AI_API_KEY)</string>
 	<key>STABILITY_AI_BASE_URL</key>
