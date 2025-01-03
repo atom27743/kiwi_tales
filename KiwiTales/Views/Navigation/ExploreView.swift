@@ -17,7 +17,24 @@ struct ExploreView: View {
 
     let filters = ["All", "Fantasy", "Nature", "Family", "Adventure"]
 
-    let columns = [GridItem(.flexible()), GridItem(.flexible())]
+    private var isIPad: Bool {
+        return UIDevice.current.userInterfaceIdiom == .pad
+    }
+    
+    private var columns: [GridItem] {
+        if isIPad {
+            return [
+                GridItem(.flexible(), spacing: 30),
+                GridItem(.flexible(), spacing: 30),
+                GridItem(.flexible(), spacing: 30)
+            ]
+        } else {
+            return [
+                GridItem(.flexible(), spacing: 20),
+                GridItem(.flexible(), spacing: 20)
+            ]
+        }
+    }
 
     @State private var showStoryView = false
     @State private var selectedBook: UserBook?
@@ -52,23 +69,22 @@ struct ExploreView: View {
             } else {
                 ScrollView(showsIndicators: false) {
                     filterButtons
-                        .padding(.horizontal, 12)
+                        .padding(.horizontal, isIPad ? 40 : 12)
 
                     ForEach(exploreViewModel.booksByTheme.keys.sorted(), id: \.self) { theme in
                         VStack(alignment: .leading) {
                             Text(theme)
                                 .foregroundStyle(Color.theme.text)
                                 .font(.headline)
-                                .padding(.horizontal, 34)
+                                .padding(.horizontal, isIPad ? 50 : 34)
 
-                            LazyVGrid(columns: columns, spacing: 20) {
+                            LazyVGrid(columns: columns, spacing: isIPad ? 40 : 20) {
                                 ForEach(exploreViewModel.booksByTheme[theme] ?? []) { book in
                                     VStack {
                                         exploreBook(book)
                                             .onTapGesture {
                                                 Task {
                                                     isLoadingBook = true
-                                                    // Ensure the book data is fully loaded before showing the sheet
                                                     if let updatedBook = await exploreViewModel.getBookDetails(book.id ?? "") {
                                                         selectedBook = updatedBook
                                                         showStoryView = true
@@ -77,10 +93,10 @@ struct ExploreView: View {
                                                 }
                                             }
                                     }
-                                    .frame(height: 310, alignment: .top)
+                                    .frame(height: isIPad ? 400 : 310, alignment: .top)
                                 }
                             }
-                            .padding(.horizontal)
+                            .padding(.horizontal, isIPad ? 40 : 16)
                         }
                         .padding(.top)
                     }
@@ -127,20 +143,20 @@ struct ExploreView: View {
                     switch phase {
                     case .empty:
                         ProgressView()
-                            .frame(width: 165, height: 250)
+                            .frame(width: isIPad ? 220 : 165, height: isIPad ? 330 : 250)
                             .background(Color.gray)
-                            .cornerRadius(10)
+                            .cornerRadius(15)
                     case .success(let image):
                         image
                             .resizable()
                             .scaledToFill()
-                            .frame(width: 165, height: 250)
-                            .cornerRadius(10)
+                            .frame(width: isIPad ? 220 : 165, height: isIPad ? 330 : 250)
+                            .cornerRadius(15)
                     case .failure:
                         Rectangle()
                             .fill(Color.gray)
-                            .frame(width: 165, height: 250)
-                            .cornerRadius(10)
+                            .frame(width: isIPad ? 220 : 165, height: isIPad ? 330 : 250)
+                            .cornerRadius(15)
                     @unknown default:
                         EmptyView()
                     }
@@ -148,18 +164,18 @@ struct ExploreView: View {
             } else {
                 Rectangle()
                     .fill(Color.gray)
-                    .frame(width: 150, height: 250)
-                    .cornerRadius(10)
+                    .frame(width: isIPad ? 220 : 150, height: isIPad ? 330 : 250)
+                    .cornerRadius(15)
             }
 
             Text(book.title)
-                .nunito(.bold, 14.0)
+                .nunito(.bold, isIPad ? 18 : 14)
                 .foregroundStyle(Color.theme.text)
                 .multilineTextAlignment(.center)
                 .lineLimit(nil)
                 .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.horizontal, 12)
-                .padding(.bottom, 6)
+                .padding(.horizontal, isIPad ? 16 : 12)
+                .padding(.bottom, isIPad ? 10 : 6)
         }
     }
     
@@ -168,20 +184,21 @@ struct ExploreView: View {
             HStack {
                 ForEach(filters, id: \.self) { filter in
                     Text(filter)
-                        .padding(.vertical, 10)
-                        .padding(.horizontal, 20)
+                        .nunito(.semiBold, isIPad ? 18 : 14)
+                        .padding(.vertical, isIPad ? 14 : 10)
+                        .padding(.horizontal, isIPad ? 30 : 20)
                         .background(exploreViewModel.selectedFilter == filter ? Color.accent : Color.theme.secondary)
                         .foregroundStyle(exploreViewModel.selectedFilter == filter ? .white : .black)
-                        .cornerRadius(20)
+                        .cornerRadius(25)
                         .onTapGesture {
                             exploreViewModel.selectedFilter = filter
                             exploreViewModel.filterBooks()
                         }
                 }
             }
-            .padding(.horizontal)
+            .padding(.horizontal, isIPad ? 40 : 16)
         }
-        .padding(.top)
+        .padding(.top, isIPad ? 30 : 20)
     }
 }
 

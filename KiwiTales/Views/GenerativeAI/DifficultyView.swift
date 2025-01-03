@@ -13,12 +13,24 @@ struct DifficultyView: View {
     
     private var data  = Array(1...4)
     private let adaptiveColumn = [GridItem(.adaptive(minimum: 150))]
+    private let fixedColumns = [
+        GridItem(.flexible(minimum: 250), spacing: 30),
+        GridItem(.flexible(minimum: 250), spacing: 30)
+    ]
     
     let color: Color = Color(hex: "BFDDFF")!
     
     private let images = ["1xDifficulty", "2xDifficulty", "3xDifficulty", "4xDifficulty"]
     private let labels = ["3 to 5", "6 to 7", "8 to 9", "10 to 12"]
     private let difficultySentences: [Int] = [5, 7, 9, 11]
+    
+    private var isIPad: Bool {
+        return UIDevice.current.userInterfaceIdiom == .pad
+    }
+    
+    private var cardSize: CGFloat {
+        return isIPad ? 250 : 150
+    }
     
     init(viewModel: GenerateStoryViewModel) {
         self._viewModel = ObservedObject(initialValue: viewModel)
@@ -30,17 +42,17 @@ struct DifficultyView: View {
                 difficultySelectionGrid()
                 informationSection()
             }
-            .padding(20)
+            .padding(isIPad ? 40 : 20)
         }
         .padding()
     }
     
     // Break down the grid content into a separate method
     private func difficultySelectionGrid() -> some View {
-        LazyVGrid(columns: adaptiveColumn, spacing: 20) {
+        LazyVGrid(columns: isIPad ? fixedColumns : adaptiveColumn, spacing: isIPad ? 30 : 20) {
             ForEach(data.indices, id: \.self) { item in
                 difficultyCard(for: item)
-                    .padding([.leading,.trailing],15)
+                    .padding([.leading,.trailing], isIPad ? 20 : 15)
             }
         }
     }
@@ -49,9 +61,11 @@ struct DifficultyView: View {
     private func difficultyCard(for item: Int) -> some View {
         ZStack {
             Image(images[item])
-                .frame(width: 150, height: 150, alignment: .center)
+                .resizable()
+                .scaledToFit()
+                .frame(width: cardSize * 0.6, height: cardSize * 0.6)
             
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: isIPad ? 15 : 10)
                 .stroke(viewModel.selectedDifficulty == labels[item] ? Color.accentColor : Color.clear, lineWidth: 4)
                 .if(showInformation) { view in
                     view.glassmorphism()
@@ -60,13 +74,14 @@ struct DifficultyView: View {
             if showInformation || viewModel.selectedDifficulty == labels[item] {
                 Text(labels[item])
                     .foregroundColor(.white)
-                    .nunito(.bold, 24)
+                    .nunito(.bold, isIPad ? 32 : 24)
                     .transition(.opacity)
                     .zIndex(1)
             }
         }
+        .frame(width: cardSize, height: cardSize)
         .background(color)
-        .cornerRadius(10)
+        .cornerRadius(isIPad ? 15 : 10)
         .foregroundStyle(Color.white)
         .font(.title)
         .softInnerShadow()
@@ -76,7 +91,7 @@ struct DifficultyView: View {
             viewModel.saveDifficulty(difficulty, sentences: sentences)
         }
         .overlay(
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: isIPad ? 15 : 10)
                 .stroke(viewModel.selectedDifficulty == labels[item] ? Color.accentColor : Color.clear, lineWidth: 4)
         )
     }
@@ -85,19 +100,19 @@ struct DifficultyView: View {
         HStack(spacing: 10) {
             if showInformation {
                 Text("* Choose a theme for your story")
-                    .nunito(.regular, 13)
+                    .nunito(.regular, isIPad ? 16 : 13)
             }
             
             Image(systemName: "questionmark.circle")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 24, height: 24)
+                .frame(width: isIPad ? 32 : 24, height: isIPad ? 32 : 24)
                 .foregroundStyle(showInformation ? Color.theme.accent : Color.gray)
                 .onTapGesture {
                     showInformation.toggle()
                 }
         }
-        .padding(20)
+        .padding(isIPad ? 30 : 20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
     }
 }

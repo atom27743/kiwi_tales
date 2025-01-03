@@ -23,6 +23,10 @@ struct HomeView: View {
     @State private var selectedBook: UserBook? = nil
     @State private var showStoryView = false
     
+    private var isIPad: Bool {
+        return UIDevice.current.userInterfaceIdiom == .pad
+    }
+    
     var body: some View {
         ZStack {
             VStack(alignment: .leading) {
@@ -30,104 +34,103 @@ struct HomeView: View {
                 CustomNavigationBarHome(selectedTab: $selectedTab, showMenu: $showMenu)
                 
                 ScrollView(showsIndicators: false) {
-                    ZStack(alignment: .topLeading) {
-                        Image("home_banner")
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(height: 200)
-                        VStack(alignment: .leading, spacing: -8) {
-                            Text("Write your own")
-                                .nunito(.semiBold, 26)
-                                .foregroundStyle(Color.white)
-                            Text("Fairytale")
-                                .nunito(.extraBold, 26)
-                                .foregroundStyle(Color.white)
-                        }
-                        .padding([.top, .leading], 32)
-                        
-                        ZStack(alignment: .bottom) {
-                            Button {
-                                selectGenerate = true
-                            } label: {
-                                Text("Start")
-                                    .nunito(.extraBold, 18)
-                                    .frame(width: 130, height: 40)
-                                    .padding(6)
-                                    .background(Color.theme.accent)
-                                    .clipShape(RoundedRectangle(cornerRadius: 24))
+                    VStack(spacing: isIPad ? 40 : 20) {
+                        // MARK: - Banner Section
+                        ZStack(alignment: .topLeading) {
+                            Image("home_banner")
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(height: isIPad ? 250 : 200)
+                            VStack(alignment: .leading, spacing: -8) {
+                                Text("Write your own")
+                                    .nunito(.semiBold, isIPad ? 32 : 26)
+                                    .foregroundStyle(Color.white)
+                                Text("Fairytale")
+                                    .nunito(.extraBold, isIPad ? 32 : 26)
+                                    .foregroundStyle(Color.white)
                             }
-                            .foregroundStyle(Color.white)
-                            .shadow(color: .black.opacity(0.4), radius: 4, x: 4, y: 4)
-                        }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-                        .padding(.bottom, 24)
-                    }
-                    
-                    // MARK: - Shows the last 5 updated books in user's repository
-                    VStack(alignment: .leading) {
-                        Button {
-                            selectedTab = .dashboard
-                        } label: {
-                            HStack(spacing: 8) {
-                                Text("My Books")
-                                    .nunito(.extraBold, 16)
-                                Image("family_star")
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 22, height: 22)
-                            }
-                            .padding(.leading, 23)
-                        }
-                        .padding(.leading, 9)
-                        .padding(.bottom, -8)
-                        .tint(.theme.text)
-                        
-                        if let user = profileViewModel.user {
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 22) {
-                                    userBooks(userBooksViewModel.books)
+                            .padding([.top, .leading], isIPad ? 40 : 32)
+                            
+                            ZStack(alignment: .bottom) {
+                                Button {
+                                    selectGenerate = true
+                                } label: {
+                                    Text("Start")
+                                        .nunito(.extraBold, isIPad ? 22 : 18)
+                                        .frame(width: isIPad ? 160 : 130, height: isIPad ? 45 : 40)
+                                        .padding(6)
+                                        .background(Color.theme.accent)
+                                        .clipShape(RoundedRectangle(cornerRadius: 24))
                                 }
-                                .frame(height: 170)
-                                .padding([.leading, .trailing], 30)
-                                .foregroundStyle(.black)
+                                .foregroundStyle(Color.white)
+                                .shadow(color: .black.opacity(0.4), radius: 4, x: 4, y: 4)
                             }
-                        } else {
-                            Text("Sign in to view your stories")
-                                .frame(height: 170)
-                                .frame(maxWidth: .infinity, alignment: .center)
-                                .padding(.leading, 23)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                            .padding(.bottom, isIPad ? 32 : 24)
                         }
-                    }
-                    .padding(.top, 19)
-                    
-                    // MARK: - Explore Section
-                    VStack(alignment: .leading) {
-                        Button {
-                            selectedTab = .explore
-                        } label: {
-                            HStack(spacing: 8) {
-                                Text("Explore")
-                                    .nunito(.extraBold, 16)
-                                Image("family_star")
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 22, height: 22)
-                            }
-                            .padding(.leading, 23)
-                        }
-                        .padding(.leading, 9)
-                        .padding(.bottom, -8)
-                        .tint(.theme.text)
+                        .padding(.bottom, isIPad ? 80 : 20)
                         
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 22) {
-                                exploreBooks(exploreViewModel.books)
+                        // MARK: - My Books Section
+                        VStack(alignment: .leading, spacing: isIPad ? 16 : 8) {
+                            Button {
+                                selectedTab = .dashboard
+                            } label: {
+                                HStack(spacing: 8) {
+                                    Text("My Books")
+                                        .nunito(.extraBold, isIPad ? 24 : 16)
+                                    Image("family_star")
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: isIPad ? 32 : 22, height: isIPad ? 32 : 22)
+                                }
+                                .padding(.leading, isIPad ? 40 : 23)
                             }
-                            .frame(height: 170)
-                            .padding([.leading, .trailing], 30)
+                            .tint(.theme.text)
+                            
+                            if let user = profileViewModel.user {
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack(spacing: isIPad ? 24 : 22) {
+                                        userBooks(userBooksViewModel.books)
+                                    }
+                                    .frame(height: isIPad ? 200 : 170)
+                                    .padding(.horizontal, isIPad ? 40 : 30)
+                                    .foregroundStyle(.black)
+                                }
+                            } else {
+                                Text("Sign in to view your stories")
+                                    .nunito(.regular, isIPad ? 20 : 16)
+                                    .frame(height: isIPad ? 200 : 170)
+                                    .frame(maxWidth: .infinity, alignment: .center)
+                            }
+                        }
+                        
+                        // MARK: - Explore Section
+                        VStack(alignment: .leading, spacing: isIPad ? 16 : 8) {
+                            Button {
+                                selectedTab = .explore
+                            } label: {
+                                HStack(spacing: 8) {
+                                    Text("Explore")
+                                        .nunito(.extraBold, isIPad ? 24 : 16)
+                                    Image("family_star")
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: isIPad ? 32 : 22, height: isIPad ? 32 : 22)
+                                }
+                                .padding(.leading, isIPad ? 40 : 23)
+                            }
+                            .tint(.theme.text)
+                            
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: isIPad ? 24 : 22) {
+                                    exploreBooks(exploreViewModel.books)
+                                }
+                                .frame(height: isIPad ? 200 : 170)
+                                .padding(.horizontal, isIPad ? 40 : 30)
+                            }
                         }
                     }
-                    .padding(.top, 12)
+                    .padding(.bottom, isIPad ? 40 : 20)
                 }
                 .onAppear {
                     userBooksViewModel.fetchUserBooks()
@@ -143,25 +146,24 @@ struct HomeView: View {
     private func userBooks(_ books: [UserBook]) -> some View {
         ForEach(userBooksViewModel.books) { book in
             VStack {
-                if let imageUrl = book.image_urls.first, let url = URL(
-                    string: imageUrl
-                ) {
+                if let imageUrl = book.image_urls.first, let url = URL(string: imageUrl) {
                     AsyncImage(url: url) { image in
                         image.resizable()
                     } placeholder: {
                         ProgressView()
                     }
                     .aspectRatio(contentMode: .fill)
-                    .frame(width: 125, height: 155)
+                    .frame(width: isIPad ? 150 : 125, height: isIPad ? 180 : 155)
                     .clipped()
-                    .cornerRadius(8)
-                    .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 3)
+                    .cornerRadius(12)
+                    .shadow(color: .black.opacity(0.2), radius: 6, x: 0, y: 4)
                 } else {
                     Color.gray
-                        .frame(width: 125, height: 155)
-                        .cornerRadius(8)
+                        .frame(width: isIPad ? 150 : 125, height: isIPad ? 180 : 155)
+                        .cornerRadius(12)
                         .overlay(
                             Text("No Image")
+                                .nunito(.regular, isIPad ? 18 : 14)
                                 .foregroundColor(.white)
                         )
                 }
@@ -172,25 +174,24 @@ struct HomeView: View {
     private func exploreBooks(_ books: [UserBook]) -> some View {
         ForEach(exploreViewModel.books.prefix(5)) { book in
             VStack {
-                if let imageUrl = book.image_urls.first, let url = URL(
-                    string: imageUrl
-                ) {
+                if let imageUrl = book.image_urls.first, let url = URL(string: imageUrl) {
                     AsyncImage(url: url) { image in
                         image.resizable()
                     } placeholder: {
                         ProgressView()
                     }
                     .aspectRatio(contentMode: .fill)
-                    .frame(width: 125, height: 155)
+                    .frame(width: isIPad ? 150 : 125, height: isIPad ? 180 : 155)
                     .clipped()
-                    .cornerRadius(8)
-                    .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 3)
+                    .cornerRadius(12)
+                    .shadow(color: .black.opacity(0.2), radius: 6, x: 0, y: 4)
                 } else {
                     Color.gray
-                        .frame(width: 125, height: 155)
-                        .cornerRadius(8)
+                        .frame(width: isIPad ? 150 : 125, height: isIPad ? 180 : 155)
+                        .cornerRadius(12)
                         .overlay(
                             Text("No Image")
+                                .nunito(.regular, isIPad ? 18 : 14)
                                 .foregroundColor(.white)
                         )
                 }

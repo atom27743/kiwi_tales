@@ -17,6 +17,10 @@ struct DashboardView: View {
     @State private var isBookOpen = false
     @State private var showStoryView = false
     @Namespace private var animation
+    
+    private var isIPad: Bool {
+        return UIDevice.current.userInterfaceIdiom == .pad
+    }
 
     var body: some View {
         ZStack {
@@ -34,13 +38,17 @@ struct DashboardView: View {
                         // Background Circles
                         Circle()
                             .fill(Color.yellow)
-                            .frame(width: geo.size.width * 2, height: geo.size.width * 2)
-                            .position(x: geo.size.width / 2, y: geo.size.height * 1)
+                            .frame(width: isIPad ? geo.size.width * 2.5 : geo.size.width * 2,
+                                   height: isIPad ? geo.size.width * 2.5 : geo.size.width * 2)
+                            .position(x: geo.size.width / 2,
+                                    y: isIPad ? geo.size.height * 1.2 : geo.size.height * 1)
 
                         Circle()
                             .fill(Color.orange)
-                            .frame(width: geo.size.width * 1.8, height: geo.size.width * 1.8)
-                            .position(x: geo.size.width / 2, y: geo.size.height * 1)
+                            .frame(width: isIPad ? geo.size.width * 2.2 : geo.size.width * 1.8,
+                                   height: isIPad ? geo.size.width * 2.2 : geo.size.width * 1.8)
+                            .position(x: geo.size.width / 2,
+                                    y: isIPad ? geo.size.height * 1.2 : geo.size.height * 1)
 
                         // Content
                         VStack {
@@ -50,7 +58,8 @@ struct DashboardView: View {
                                     selectedIndex: $selectedIndex,
                                     books: userBooksViewModel.books
                                 )
-                                .frame(width: UIScreen.main.bounds.width, height: 400)
+                                .frame(width: UIScreen.main.bounds.width,
+                                      height: isIPad ? 600 : 400)
                                 .offset(x: 0)
                                 .onTapGesture {
                                     if selectedIndex < userBooksViewModel.books.count {
@@ -59,8 +68,8 @@ struct DashboardView: View {
                                 }
                             } else {
                                 Text("No books available")
-                                    .nunito(.bold, 28)
-                                    .offset(y:100)
+                                    .nunito(.bold, isIPad ? 36 : 28)
+                                    .offset(y: isIPad ? 150 : 100)
                                     .foregroundColor(.white)
                             }
                         }

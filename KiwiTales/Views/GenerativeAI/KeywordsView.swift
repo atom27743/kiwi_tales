@@ -5,7 +5,6 @@
 //  Created by Takumi Otsuka on 9/6/24.
 //
 
-
 import SwiftUI
 
 struct KeywordsView: View {
@@ -13,54 +12,42 @@ struct KeywordsView: View {
     @State private var keyboardOffset: CGFloat = 0
     @FocusState private var focusedField: Field?
     
+    private var isIPad: Bool {
+        return UIDevice.current.userInterfaceIdiom == .pad
+    }
+    
     enum Field {
         case first, second, third
     }
     
     var body: some View {
-        VStack(spacing: 34) {
-            TextField("e.g. Princess", text: Binding(
-                get: { viewModel.keywords[safe: 0] ?? "" },
-                set: { viewModel.keywords[safe: 0] = $0 }
-            ))
-            .textFieldStyle(SoftInnerShadowTextFieldStyle())
-            .focused($focusedField, equals: .first)
-            .submitLabel(.next)
-            .onSubmit {
-                focusedField = .second
-            }
+        VStack(spacing: isIPad ? 50 : 34) {
+            keywordTextField(placeholder: "e.g. Princess",
+                           index: 0,
+                           field: .first,
+                           nextField: .second)
             
-            TextField("e.g. Stinky", text: Binding(
-                get: { viewModel.keywords[safe: 1] ?? "" },
-                set: { viewModel.keywords[safe: 1] = $0 }
-            ))
-            .textFieldStyle(SoftInnerShadowTextFieldStyle())
-            .focused($focusedField, equals: .second)
-            .submitLabel(.next)
-            .onSubmit {
-                focusedField = .third
-            }
+            keywordTextField(placeholder: "e.g. Stinky",
+                           index: 1,
+                           field: .second,
+                           nextField: .third)
             
-            TextField("e.g. Flower", text: Binding(
-                get: { viewModel.keywords[safe: 2] ?? "" },
-                set: { viewModel.keywords[safe: 2] = $0 }
-            ))
-            .textFieldStyle(SoftInnerShadowTextFieldStyle())
-            .focused($focusedField, equals: .third)
-            .submitLabel(.done)
+            keywordTextField(placeholder: "e.g. Flower",
+                           index: 2,
+                           field: .third,
+                           nextField: nil)
             
             Spacer()
         }
-        .padding(.horizontal)
-        .padding(.top, 44)
+        .padding(.horizontal, isIPad ? 100 : 16)
+        .padding(.top, isIPad ? 60 : 44)
         .padding(.bottom, keyboardOffset)
         .onAppear {
             NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { notification in
                 if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
-                    // Only move up when the last TextField is focused
                     if focusedField == .third {
                         withAnimation {
-                            keyboardOffset = keyboardFrame.height + 34
+                            keyboardOffset = keyboardFrame.height + (isIPad ? 50 : 34)
                         }
                     }
                 }
@@ -75,6 +62,23 @@ struct KeywordsView: View {
         .onDisappear {
             NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
             NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+        }
+    }
+    
+    private func keywordTextField(placeholder: String, index: Int, field: Field, nextField: Field?) -> some View {
+        TextField(placeholder, text: Binding(
+            get: { viewModel.keywords[safe: index] ?? "" },
+            set: { viewModel.keywords[safe: index] = $0 }
+        ))
+        .textFieldStyle(SoftInnerShadowTextFieldStyle())
+        .focused($focusedField, equals: field)
+        .submitLabel(nextField != nil ? .next : .done)
+        .font(.system(size: isIPad ? 24 : 17))
+        .frame(maxWidth: isIPad ? 600 : .infinity)
+        .onSubmit {
+            if let next = nextField {
+                focusedField = next
+            }
         }
     }
 }
