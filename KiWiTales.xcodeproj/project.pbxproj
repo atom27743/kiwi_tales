@@ -16,7 +16,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		42893AA82C89FBA7009E4635 /* KiWiTales.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KiWiTales.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		42893AA82C89FBA7009E4635 /* KiwiTales.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KiwiTales.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -25,12 +25,12 @@
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 42893AA72C89FBA7009E4635 /* KiWiTales */;
+			target = 42893AA72C89FBA7009E4635 /* KiwiTales */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		42893AAA2C89FBA7009E4635 /* KiWiTales */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (42893AC72C89FF24009E4635 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = KiWiTales; sourceTree = "<group>"; };
+		42893AAA2C89FBA7009E4635 /* KiwiTales */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (42893AC72C89FF24009E4635 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = KiwiTales; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,7 +53,7 @@
 		42893A9F2C89FBA7009E4635 = {
 			isa = PBXGroup;
 			children = (
-				42893AAA2C89FBA7009E4635 /* KiWiTales */,
+				42893AAA2C89FBA7009E4635 /* KiwiTales */,
 				42893AA92C89FBA7009E4635 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -61,7 +61,7 @@
 		42893AA92C89FBA7009E4635 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				42893AA82C89FBA7009E4635 /* KiWiTales.app */,
+				42893AA82C89FBA7009E4635 /* KiwiTales.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -69,9 +69,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		42893AA72C89FBA7009E4635 /* KiWiTales */ = {
+		42893AA72C89FBA7009E4635 /* KiwiTales */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 42893AB72C89FBA8009E4635 /* Build configuration list for PBXNativeTarget "KiWiTales" */;
+			buildConfigurationList = 42893AB72C89FBA8009E4635 /* Build configuration list for PBXNativeTarget "KiwiTales" */;
 			buildPhases = (
 				42893AA42C89FBA7009E4635 /* Sources */,
 				42893AA52C89FBA7009E4635 /* Frameworks */,
@@ -82,9 +82,9 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				42893AAA2C89FBA7009E4635 /* KiWiTales */,
+				42893AAA2C89FBA7009E4635 /* KiwiTales */,
 			);
-			name = KiWiTales;
+			name = KiwiTales;
 			packageProductDependencies = (
 				42893AC22C89FECD009E4635 /* GoogleSignIn */,
 				42893AC42C89FECD009E4635 /* GoogleSignInSwift */,
@@ -94,7 +94,7 @@
 				429BE2AC2CA5AC99007B7E30 /* FirebaseStorage */,
 			);
 			productName = KiWi;
-			productReference = 42893AA82C89FBA7009E4635 /* KiWiTales.app */;
+			productReference = 42893AA82C89FBA7009E4635 /* KiwiTales.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -112,7 +112,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 42893AA32C89FBA7009E4635 /* Build configuration list for PBXProject "KiWiTales" */;
+			buildConfigurationList = 42893AA32C89FBA7009E4635 /* Build configuration list for PBXProject "KiwiTales" */;
 			compatibilityVersion = "Xcode 15.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -130,7 +130,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				42893AA72C89FBA7009E4635 /* KiWiTales */,
+				42893AA72C89FBA7009E4635 /* KiwiTales */,
 			);
 		};
 /* End PBXProject section */
@@ -272,22 +272,23 @@
 		};
 		42893AB82C89FBA8009E4635 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 42893AAA2C89FBA7009E4635 /* KiWiTales */;
+			baseConfigurationReferenceAnchor = 42893AAA2C89FBA7009E4635 /* KiwiTales */;
 			baseConfigurationReferenceRelativePath = Development.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = KiWiTales/KiWiTales.entitlements;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_ENTITLEMENTS = KiwiTales/KiwiTales.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"KiWiTales/Preview Content\"";
-				DEVELOPMENT_TEAM = 4DVD7FVTR7;
+				DEVELOPMENT_ASSET_PATHS = "\"KiwiTales/Preview Content\"";
+				DEVELOPMENT_TEAM = CVKKS7P446;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = KiWiTales/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = KiWiTales;
+				INFOPLIST_FILE = KiwiTales/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = KiwiTales;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -296,42 +297,43 @@
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.takumiotsuka.KiWiTales;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jinalee.KiwiTales;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 2.0;
 			};
 			name = Debug;
 		};
 		42893AB92C89FBA8009E4635 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 42893AAA2C89FBA7009E4635 /* KiWiTales */;
+			baseConfigurationReferenceAnchor = 42893AAA2C89FBA7009E4635 /* KiwiTales */;
 			baseConfigurationReferenceRelativePath = Development.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = KiWiTales/KiWiTales.entitlements;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_ENTITLEMENTS = KiwiTales/KiwiTales.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"KiWiTales/Preview Content\"";
-				DEVELOPMENT_TEAM = 4DVD7FVTR7;
+				DEVELOPMENT_ASSET_PATHS = "\"KiwiTales/Preview Content\"";
+				DEVELOPMENT_TEAM = CVKKS7P446;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = KiWiTales/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = KiWiTales;
+				INFOPLIST_FILE = KiwiTales/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = KiwiTales;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -340,20 +342,20 @@
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.takumiotsuka.KiWiTales;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jinalee.KiwiTales;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 2.0;
 			};
 			name = Release;
@@ -361,7 +363,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		42893AA32C89FBA7009E4635 /* Build configuration list for PBXProject "KiWiTales" */ = {
+		42893AA32C89FBA7009E4635 /* Build configuration list for PBXProject "KiwiTales" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				42893AB52C89FBA8009E4635 /* Debug */,
@@ -370,7 +372,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		42893AB72C89FBA8009E4635 /* Build configuration list for PBXNativeTarget "KiWiTales" */ = {
+		42893AB72C89FBA8009E4635 /* Build configuration list for PBXNativeTarget "KiwiTales" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				42893AB82C89FBA8009E4635 /* Debug */,

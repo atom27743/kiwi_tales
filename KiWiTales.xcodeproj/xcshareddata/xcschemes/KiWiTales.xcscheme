@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "42893AA72C89FBA7009E4635"
-               BuildableName = "KiWiTales.app"
-               BlueprintName = "KiWiTales"
-               ReferencedContainer = "container:KiWiTales.xcodeproj">
+               BuildableName = "KiwiTales.app"
+               BlueprintName = "KiwiTales"
+               ReferencedContainer = "container:KiwiTales.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -45,9 +45,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "42893AA72C89FBA7009E4635"
-            BuildableName = "KiWiTales.app"
-            BlueprintName = "KiWiTales"
-            ReferencedContainer = "container:KiWiTales.xcodeproj">
+            BuildableName = "KiwiTales.app"
+            BlueprintName = "KiwiTales"
+            ReferencedContainer = "container:KiwiTales.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -62,9 +62,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "42893AA72C89FBA7009E4635"
-            BuildableName = "KiWiTales.app"
-            BlueprintName = "KiWiTales"
-            ReferencedContainer = "container:KiWiTales.xcodeproj">
+            BuildableName = "KiwiTales.app"
+            BlueprintName = "KiwiTales"
+            ReferencedContainer = "container:KiwiTales.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
@@ -73,6 +73,7 @@
    </AnalyzeAction>
    <ArchiveAction
       buildConfiguration = "Release"
+      customArchiveName = "KiwiTales"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>
