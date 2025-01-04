@@ -1,7 +1,11 @@
+#!/bin/zsh
+
+#  ci_post_xcodebuild.sh
+#  KiwiTales
 #
-//  ci_post_xcode.sh
-//  KiwiTales
-//
-//  Created by Jina Lee on 1/4/25.
-//
+#  Created by Jina Lee on 1/4/25.
+#
+
+echo "No post-Xcodebuild tasks needed."
+exit 0
 
