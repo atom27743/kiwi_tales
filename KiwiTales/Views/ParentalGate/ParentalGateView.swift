@@ -21,13 +21,20 @@ struct ParentalGateView: View {
                 .font(.title)
                 .fontWeight(.bold)
             
-            Text("This section requires parental permission.")
+            Text("Sign in requires parental permission.")
                 .font(.headline)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
+                .foregroundColor(.gray)
+                .padding(.bottom, 20)
             
-            Text("Please solve this math problem:")
-                .padding(.top)
+            Divider()
+                .background(Color.gray)
+                .frame(height: 1)
+                .padding(.horizontal)
+            
+            Text("Please solve the problem to proceed:")
+                .padding(.top, 40)
             
             Text("\(num1) \(operation.symbol()) \(num2) = ?")
                 .font(.title2)
@@ -36,19 +43,23 @@ struct ParentalGateView: View {
             TextField("Enter answer", text: $answer)
                 .keyboardType(.numberPad)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
-                .frame(width: 200)
+                .frame(maxWidth: .infinity)
                 .padding()
-            
+                .padding(.horizontal)
+                .padding(.bottom, 10)
+                        
             if showError {
-                Text("Incorrect answer. Try another question.")
+                Text("Incorrect answer. Try again.")
                     .foregroundColor(.red)
             }
             
-            Button("Submit") {
-                verifyAnswer()
+            Button(action: verifyAnswer) {
+                Text("Submit")
+                    .padding(4)
+                    .padding(.horizontal)
             }
             .buttonStyle(.borderedProminent)
-            .padding()
+            .padding(.top, 24)
             
             Button("Cancel") {
                 dismiss()
