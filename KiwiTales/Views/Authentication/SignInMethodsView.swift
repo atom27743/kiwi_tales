@@ -10,6 +10,7 @@ import FirebaseAuth
 
 struct SignInMethodsView: View {
     @StateObject private var viewModel: AuthenticationViewModel = AuthenticationViewModel()
+    @StateObject private var parentalGateVM = ParentalGateViewModel.shared
     @Binding var showSignInView: Bool
     @Environment(\.dismiss) private var dismiss
     @State private var showError = false
@@ -26,13 +27,15 @@ struct SignInMethodsView: View {
             
             if !viewModel.isProviderLinked(.google) {
                 Button {
-                    Task {
-                        do {
-                            try await viewModel.signInGoogle()
-                            showSignInView = false
-                            UserDefaults.standard.set(true, forKey: "wasSignedInWithSSO")
-                        } catch {
-                            viewModel.handleError(error)
+                    parentalGateVM.requireParentalGate {
+                        Task {
+                            do {
+                                try await viewModel.signInGoogle()
+                                showSignInView = false
+                                UserDefaults.standard.set(true, forKey: "wasSignedInWithSSO")
+                            } catch {
+                                viewModel.handleError(error)
+                            }
                         }
                     }
                 } label: {
@@ -58,13 +61,15 @@ struct SignInMethodsView: View {
             
             if !viewModel.isProviderLinked(.apple) {
                 Button {
-                    Task {
-                        do {
-                            try await viewModel.signInApple()
-                            showSignInView = false
-                            UserDefaults.standard.set(true, forKey: "wasSignedInWithSSO")
-                        } catch {
-                            viewModel.handleError(error)
+                    parentalGateVM.requireParentalGate {
+                        Task {
+                            do {
+                                try await viewModel.signInApple()
+                                showSignInView = false
+                                UserDefaults.standard.set(true, forKey: "wasSignedInWithSSO")
+                            } catch {
+                                viewModel.handleError(error)
+                            }
                         }
                     }
                 } label: {
@@ -117,6 +122,11 @@ struct SignInMethodsView: View {
             Button("OK", role: .cancel) { }
         } message: {
             Text(viewModel.errorMessage ?? "An error occurred")
+        }
+        .sheet(isPresented: $parentalGateVM.showParentalGate) {
+            ParentalGateView(onSuccess: {
+                parentalGateVM.parentalGateSucceeded()
+            })
         }
         .onAppear {
             viewModel.updateProviders()

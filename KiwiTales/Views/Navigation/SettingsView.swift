@@ -9,7 +9,10 @@ import SwiftUI
 
 struct SettingsView: View {
     @StateObject private var viewModel: SettingsViewModel = SettingsViewModel()
+    @StateObject private var parentalGateVM = ParentalGateViewModel.shared
+    @Environment(\.dismiss) private var dismiss
     @Binding var showSignInView: Bool
+    let user: AuthDataResultModel
     
     var body: some View {
         List {
@@ -39,12 +42,14 @@ struct SettingsView: View {
                 }
                 
                 Button(role: .destructive) {
-                    Task {
-                        do {
-                            try await viewModel.deleteAccount()
-                            showSignInView = true
-                        } catch {
-                            print(error)
+                    parentalGateVM.requireParentalGate {
+                        Task {
+                            do {
+                                try await viewModel.deleteAccount()
+                                showSignInView = true
+                            } catch {
+                                print(error)
+                            }
                         }
                     }
                 } label: {
@@ -61,11 +66,13 @@ struct SettingsView: View {
                 if user.isAnonymous {
                     Section {
                         Button {
-                            Task {
-                                do {
-                                    try await viewModel.linkToEmail()
-                                } catch {
-                                    print(error)
+                            parentalGateVM.requireParentalGate {
+                                Task {
+                                    do {
+                                        try await viewModel.linkToEmail()
+                                    } catch {
+                                        print(error)
+                                    }
                                 }
                             }
                         } label: {
@@ -73,11 +80,13 @@ struct SettingsView: View {
                         }
                         
                         Button {
-                            Task {
-                                do {
-                                    try await viewModel.linkToGoogle()
-                                } catch {
-                                    print(error)
+                            parentalGateVM.requireParentalGate {
+                                Task {
+                                    do {
+                                        try await viewModel.linkToGoogle()
+                                    } catch {
+                                        print(error)
+                                    }
                                 }
                             }
                         } label: {
@@ -85,11 +94,13 @@ struct SettingsView: View {
                         }
                         
                         Button {
-                            Task {
-                                do {
-                                    try await viewModel.linkToApple()
-                                } catch {
-                                    print(error)
+                            parentalGateVM.requireParentalGate {
+                                Task {
+                                    do {
+                                        try await viewModel.linkToApple()
+                                    } catch {
+                                        print(error)
+                                    }
                                 }
                             }
                         } label: {
@@ -106,6 +117,11 @@ struct SettingsView: View {
             viewModel.loadAuthUser()
         }
         .navigationTitle("Settings")
+        .sheet(isPresented: $parentalGateVM.showParentalGate) {
+            ParentalGateView(onSuccess: {
+                parentalGateVM.parentalGateSucceeded()
+            })
+        }
     }
 }
 

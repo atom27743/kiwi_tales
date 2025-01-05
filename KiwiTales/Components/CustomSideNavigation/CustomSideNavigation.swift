@@ -11,11 +11,14 @@ import FirebaseAuth
 struct CustomSideNavigation: View {
     @ObservedObject var viewModel: AuthenticationViewModel
     @ObservedObject var profileViewModel: ProfileViewModel
+    @StateObject private var parentalGateVM = ParentalGateViewModel.shared
     
     @Binding var selectedTab: Tabs
     @Binding var showMenu: Bool
     @Binding var showSignInView: Bool
     @State private var showDeleteAlert = false
+    @State private var showSettings = false
+    @State private var showDeleteConfirmation = false
     
     var body: some View {
         ZStack {
@@ -91,13 +94,15 @@ struct CustomSideNavigation: View {
                                     .padding(.bottom, 40)
                                 } else {
                                     Button {
-                                        Task {
-                                            do {
-                                                showMenu = false
-                                                try AuthenticationManager.shared.signOut()
-                                                try await viewModel.signInAnonymously()
-                                            } catch {
-                                                print("Error: \(error)")
+                                        parentalGateVM.requireParentalGate {
+                                            Task {
+                                                do {
+                                                    showMenu = false
+                                                    try AuthenticationManager.shared.signOut()
+                                                    try await viewModel.signInAnonymously()
+                                                } catch {
+                                                    print("Error: \(error)")
+                                                }
                                             }
                                         }
                                     } label: {
@@ -110,7 +115,9 @@ struct CustomSideNavigation: View {
                                     .padding(.horizontal)
                                     
                                     Button {
-                                        showDeleteAlert = true
+                                        parentalGateVM.requireParentalGate {
+                                            showDeleteConfirmation = true
+                                        }
                                     } label: {
                                         Text("Delete Account")
                                             .nunito(.bold, 18)
@@ -120,7 +127,7 @@ struct CustomSideNavigation: View {
                                     }
                                     .padding(.horizontal)
                                     .padding(.bottom, 40)
-                                    .alert("Delete Account", isPresented: $showDeleteAlert) {
+                                    .alert("Delete Account", isPresented: $showDeleteConfirmation) {
                                         Button("Cancel", role: .cancel) { }
                                         Button("Delete", role: .destructive) {
                                             Task {
@@ -162,6 +169,11 @@ struct CustomSideNavigation: View {
                 }
                 .frame(maxWidth: .infinity)
             }
+        }
+        .sheet(isPresented: $parentalGateVM.showParentalGate) {
+            ParentalGateView(onSuccess: {
+                parentalGateVM.parentalGateSucceeded()
+            })
         }
         .transition(.move(edge: .leading))
         .animation(.easeInOut(duration: 0.5), value: showMenu)
