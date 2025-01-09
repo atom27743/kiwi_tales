@@ -11,9 +11,6 @@ import FirebaseCore
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-        if #unavailable(iOS 16, *) {
-            FirebaseApp.configure()
-        }
         
         return true
     }
@@ -24,9 +21,7 @@ struct KiwiTalesApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
 
     init() {
-        if #available(iOS 16, *) {
-            FirebaseApp.configure()
-        }
+        FirebaseApp.configure()
     }
 
     var body: some Scene {
