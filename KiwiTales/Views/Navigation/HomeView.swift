@@ -87,7 +87,7 @@ struct HomeView: View {
                             }
                             .tint(.theme.text)
                             
-                            if let user = profileViewModel.user {
+                            if profileViewModel.user != nil {
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack(spacing: isIPad ? 24 : 22) {
                                         userBooks(userBooksViewModel.books)

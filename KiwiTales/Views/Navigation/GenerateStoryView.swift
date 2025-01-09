@@ -17,6 +17,7 @@ struct GenerateStoryView: View {
     @ObservedObject var authenticationViewModel: AuthenticationViewModel
     @ObservedObject var generateStoryViewModel: GenerateStoryViewModel
     @ObservedObject var profileViewModel: ProfileViewModel
+    @StateObject private var parentalGateVM = ParentalGateViewModel.shared
     
     @State private var currentPage: Int = 0
     @State private var createStory: Bool = false
@@ -101,7 +102,13 @@ struct GenerateStoryView: View {
                                 title: Text("Authentication Required"),
                                 message: Text(alertMessage),
                                 primaryButton: .default(Text("Sign In"), action: {
-                                    showSignInView = true
+                                    if parentalGateVM.isParentalGateCompleted {
+                                        showSignInView = true
+                                    } else {
+                                        parentalGateVM.requireParentalGate {
+                                            showSignInView = true
+                                        }
+                                    }
                                 }),
                                 secondaryButton: .cancel()
                             )
@@ -124,6 +131,11 @@ struct GenerateStoryView: View {
             AuthenticationView(showSignInView: $showSignInView)
                 .presentationDetents([.height(300)])
                 .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $parentalGateVM.showParentalGate) {
+            ParentalGateView(onSuccess: {
+                parentalGateVM.parentalGateSucceeded()
+            })
         }
         .fullScreenCover(isPresented: $createStory, content: {
             StoryView(viewModel: generateStoryViewModel, selectGenerate: $selectGenerate)

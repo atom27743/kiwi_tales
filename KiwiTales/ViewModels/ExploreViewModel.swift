@@ -46,7 +46,7 @@ class ExploreViewModel: ObservableObject {
         errorMessage = nil
         
         let settings = FirestoreSettings()
-        settings.isPersistenceEnabled = true  // Enable offline persistence
+        settings.isPersistenceEnabled = true  
         settings.cacheSizeBytes = FirestoreCacheSizeUnlimited
         db.settings = settings
         

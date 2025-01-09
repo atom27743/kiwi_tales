@@ -27,18 +27,33 @@ enum MathOperation: CaseIterable {
 class ParentalGateViewModel: ObservableObject {
     @Published var showParentalGate = false
     @Published var gateAction: (() -> Void)?
+    @Published var isParentalGateCompleted = false
     
     static let shared = ParentalGateViewModel()
     
-    private init() {}
+    private init() {
+        isParentalGateCompleted = UserDefaults.standard.bool(forKey: "ParentalGateCompleted")
+        print("🔒 ParentalGate - Initial State: \(isParentalGateCompleted)")
+    }
     
     func requireParentalGate(for action: @escaping () -> Void) {
-        self.gateAction = action
-        self.showParentalGate = true
+        print("🔒 ParentalGate - Checking completion state: \(isParentalGateCompleted)")
+        if isParentalGateCompleted {
+            print("🔒 ParentalGate - Already completed, executing action directly")
+            action()
+        } else {
+            print("🔒 ParentalGate - Not completed, showing gate view")
+            self.gateAction = action
+            self.showParentalGate = true
+        }
     }
     
     func parentalGateSucceeded() {
+        print("🔒 ParentalGate - Successfully completed!")
+        isParentalGateCompleted = true
+        UserDefaults.standard.set(true, forKey: "ParentalGateCompleted")
         if let action = gateAction {
+            print("🔒 ParentalGate - Executing stored action")
             action()
         }
         gateAction = nil

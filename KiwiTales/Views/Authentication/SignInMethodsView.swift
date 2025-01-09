@@ -27,15 +27,13 @@ struct SignInMethodsView: View {
             
             if !viewModel.isProviderLinked(.google) {
                 Button {
-                    parentalGateVM.requireParentalGate {
-                        Task {
-                            do {
-                                try await viewModel.signInGoogle()
-                                showSignInView = false
-                                UserDefaults.standard.set(true, forKey: "wasSignedInWithSSO")
-                            } catch {
-                                viewModel.handleError(error)
-                            }
+                    Task {
+                        do {
+                            try await viewModel.signInGoogle()
+                            showSignInView = false
+                            UserDefaults.standard.set(true, forKey: "wasSignedInWithSSO")
+                        } catch {
+                            viewModel.handleError(error)
                         }
                     }
                 } label: {
@@ -61,15 +59,13 @@ struct SignInMethodsView: View {
             
             if !viewModel.isProviderLinked(.apple) {
                 Button {
-                    parentalGateVM.requireParentalGate {
-                        Task {
-                            do {
-                                try await viewModel.signInApple()
-                                showSignInView = false
-                                UserDefaults.standard.set(true, forKey: "wasSignedInWithSSO")
-                            } catch {
-                                viewModel.handleError(error)
-                            }
+                    Task {
+                        do {
+                            try await viewModel.signInApple()
+                            showSignInView = false
+                            UserDefaults.standard.set(true, forKey: "wasSignedInWithSSO")
+                        } catch {
+                            viewModel.handleError(error)
                         }
                     }
                 } label: {

@@ -33,10 +33,10 @@ final class AuthenticationViewModel: ObservableObject {
         
         if let currentUser = Auth.auth().currentUser {
             if currentUser.isAnonymous {
-                try await AuthenticationManager.shared.linkGoogle(tokens: tokens)
+                _ = try await AuthenticationManager.shared.linkGoogle(tokens: tokens)
             } else {
                 // Link Google to existing SSO account
-                try await AuthenticationManager.shared.linkGoogle(tokens: tokens)
+                _ = try await AuthenticationManager.shared.linkGoogle(tokens: tokens)
             }
         } else {
             try await AuthenticationManager.shared.signInWithGoogle(tokens: tokens)
@@ -48,7 +48,6 @@ final class AuthenticationViewModel: ObservableObject {
         let manager = SignInAppleManager()
         let tokens = try await manager.startSignInWithAppleFlow()
         try await AuthenticationManager.shared.signInWithApple(tokens: tokens)
-//        updateProviders()
     }
     
     func signInAnonymously() async throws {

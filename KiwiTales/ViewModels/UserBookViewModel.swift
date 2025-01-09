@@ -20,8 +20,6 @@ class UserBookViewModel: ObservableObject {
 
     init(fetchSpecificUser: Bool = false, specificUserID: String? = nil) {
         self.fetchSpecificUser = fetchSpecificUser
-//        self.specificUserID = Tokens.atom
-        self.specificUserID = "QPjGy24vi1fns0OeMC79TweO1Oh2"
         setupAuthStateListener()
     }
 
@@ -39,7 +37,7 @@ class UserBookViewModel: ObservableObject {
             authStateListener = Auth
                 .auth()
                 .addStateDidChangeListener { [weak self] auth, user in
-                    if let user = user {
+                    if user != nil {
                         self?.fetchUserBooks()
                     } else {
                         self?.books = []

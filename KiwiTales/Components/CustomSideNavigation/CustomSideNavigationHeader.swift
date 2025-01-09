@@ -108,7 +108,7 @@ struct CustomSideNavigationHeader: View {
         .task {
             await loadUserProfile()
         }
-        .onChange(of: profileViewModel.user?.name) { newValue in
+        .onChange(of: profileViewModel.user?.name) { _, newValue in
             print("Display name updated: \(newValue ?? "nil")")
         }
     }

@@ -82,7 +82,13 @@ struct CustomSideNavigation: View {
                             if let user = Auth.auth().currentUser {
                                 if user.isAnonymous {
                                     Button {
-                                        showSignInView = true
+                                        if parentalGateVM.isParentalGateCompleted {
+                                            showSignInView = true
+                                        } else {
+                                            parentalGateVM.requireParentalGate {
+                                                showSignInView = true
+                                            }
+                                        }
                                     } label: {
                                         Text("Sign In")
                                             .nunito(.bold, 18)

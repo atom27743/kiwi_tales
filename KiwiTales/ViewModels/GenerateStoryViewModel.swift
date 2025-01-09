@@ -497,9 +497,22 @@ class GenerateStoryViewModel: ObservableObject {
             self.isCoverImageGenerated = false
         }
         
+        // Create an actor to safely track failed loads
+        actor FailureTracker {
+            private var count: Int = 0
+            
+            func increment() {
+                count += 1
+            }
+            
+            func getCount() -> Int {
+                return count
+            }
+        }
+        
         // Load images asynchronously
         Task {
-            var failedImageCount = 0
+            let failureTracker = FailureTracker()
             
             // Load cover image first
             if let firstImageURL = userBook.image_urls.first {
@@ -508,13 +521,10 @@ class GenerateStoryViewModel: ObservableObject {
                     await MainActor.run {
                         self.generatedImages[0] = coverImage
                         self.isCoverImageGenerated = true
-                        if coverImage == nil {
-                            failedImageCount += 1
-                        }
                     }
                 } catch {
                     print("Error loading cover image: \(error)")
-                    failedImageCount += 1
+                    await failureTracker.increment()
                 }
             }
             
@@ -533,6 +543,7 @@ class GenerateStoryViewModel: ObservableObject {
                             if let image = try? await StorageManager.shared.downloadImage(from: urlString) {
                                 return (actualIndex, image)
                             }
+                            await failureTracker.increment()
                             return (actualIndex, nil)
                         }
                     }
@@ -540,19 +551,18 @@ class GenerateStoryViewModel: ObservableObject {
                     for await (index, image) in group {
                         await MainActor.run {
                             self.generatedImages[index] = image
-                            if image == nil {
-                                failedImageCount += 1
-                            }
                             self.updateProgress()
                         }
                     }
                 }
             }
             
+            // Final update on main actor
+            let failedCount = await failureTracker.getCount()
             await MainActor.run {
                 self.isLoading = false
-                if failedImageCount > 0 {
-                    self.errorMessage = "Some images failed to load. The story may not display correctly."
+                if failedCount > 0 {
+                    self.errorMessage = "Some images (\(failedCount)) failed to load. The story may not display correctly."
                 }
             }
         }
