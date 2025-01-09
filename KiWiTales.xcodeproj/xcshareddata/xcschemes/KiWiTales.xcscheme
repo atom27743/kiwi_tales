@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1600"
+   LastUpgradeVersion = "1620"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -18,7 +18,7 @@
                BlueprintIdentifier = "42893AA72C89FBA7009E4635"
                BuildableName = "KiwiTales.app"
                BlueprintName = "KiwiTales"
-               ReferencedContainer = "container:KiwiTales.xcodeproj">
+               ReferencedContainer = "container:KiWiTales.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -47,7 +47,7 @@
             BlueprintIdentifier = "42893AA72C89FBA7009E4635"
             BuildableName = "KiwiTales.app"
             BlueprintName = "KiwiTales"
-            ReferencedContainer = "container:KiwiTales.xcodeproj">
+            ReferencedContainer = "container:KiWiTales.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -64,7 +64,7 @@
             BlueprintIdentifier = "42893AA72C89FBA7009E4635"
             BuildableName = "KiwiTales.app"
             BlueprintName = "KiwiTales"
-            ReferencedContainer = "container:KiwiTales.xcodeproj">
+            ReferencedContainer = "container:KiWiTales.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
@@ -74,6 +74,7 @@
    <ArchiveAction
       buildConfiguration = "Release"
       customArchiveName = "KiwiTales"
-      revealArchiveInOrganizer = "YES">
+      revealArchiveInOrganizer = "YES"
+      allowsArchivingForSimulator = "YES">
    </ArchiveAction>
 </Scheme>

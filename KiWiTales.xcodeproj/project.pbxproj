@@ -24,6 +24,7 @@
 		42893AC72C89FF24009E4635 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Development.xcconfig,
 				Info.plist,
 			);
 			target = 42893AA72C89FBA7009E4635 /* KiwiTales */;
@@ -115,14 +116,14 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1600;
-				LastUpgradeCheck = 1600;
+				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					42893AA72C89FBA7009E4635 = {
 						CreatedOnToolsVersion = 16.0;
 					};
 				};
 			};
-			buildConfigurationList = 42893AA32C89FBA7009E4635 /* Build configuration list for PBXProject "KiwiTales" */;
+			buildConfigurationList = 42893AA32C89FBA7009E4635 /* Build configuration list for PBXProject "KiWiTales" */;
 			compatibilityVersion = "Xcode 15.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -200,6 +201,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -261,6 +263,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -292,6 +295,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"KiwiTales/Preview Content\"";
 				DEVELOPMENT_TEAM = CVKKS7P446;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -316,6 +320,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.jinalee.KiwiTales;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
+				SKIP_INSTALL = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -337,6 +342,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"KiwiTales/Preview Content\"";
 				DEVELOPMENT_TEAM = CVKKS7P446;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -361,6 +367,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.jinalee.KiwiTales;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
+				SKIP_INSTALL = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -373,7 +380,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		42893AA32C89FBA7009E4635 /* Build configuration list for PBXProject "KiwiTales" */ = {
+		42893AA32C89FBA7009E4635 /* Build configuration list for PBXProject "KiWiTales" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				42893AB52C89FBA8009E4635 /* Debug */,
