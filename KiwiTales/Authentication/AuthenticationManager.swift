@@ -185,7 +185,7 @@ extension AuthenticationManager {
                 // If we have a credential from the error, use it to sign in
                 if let credential = nsError.userInfo["FIRAuthErrorUserInfoUpdatedCredentialKey"] as? AuthCredential {
                     // Store anonymous user ID for potential data migration
-                    let anonymousUserId = Auth.auth().currentUser?.uid
+                    _ = Auth.auth().currentUser?.uid
                     
                     // Sign out of anonymous account
                     try await Auth.auth().currentUser?.delete()
