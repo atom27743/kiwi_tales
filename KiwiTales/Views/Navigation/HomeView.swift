@@ -41,15 +41,16 @@ struct HomeView: View {
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
                                 .frame(height: isIPad ? 250 : 200)
-                            VStack(alignment: .leading, spacing: -8) {
+                                // .clipped()
+                            VStack(alignment: .leading, spacing: isIPad ? 0 : -8) {
                                 Text("Write your own")
-                                    .nunito(.semiBold, isIPad ? 32 : 26)
+                                    .nunito(.semiBold, isIPad ? 36 : 26)
                                     .foregroundStyle(Color.white)
                                 Text("Fairytale")
-                                    .nunito(.extraBold, isIPad ? 32 : 26)
+                                    .nunito(.extraBold, isIPad ? 36 : 26)
                                     .foregroundStyle(Color.white)
                             }
-                            .padding([.top, .leading], isIPad ? 40 : 32)
+                            .padding([.top, .leading], isIPad ? 48 : 32)
                             
                             ZStack(alignment: .bottom) {
                                 Button {
@@ -57,7 +58,7 @@ struct HomeView: View {
                                 } label: {
                                     Text("Start")
                                         .nunito(.extraBold, isIPad ? 22 : 18)
-                                        .frame(width: isIPad ? 160 : 130, height: isIPad ? 45 : 40)
+                                        .frame(width: isIPad ? 160 : 130, height: isIPad ? 48 : 40)
                                         .padding(6)
                                         .background(Color.theme.accent)
                                         .clipShape(RoundedRectangle(cornerRadius: 24))
@@ -66,12 +67,12 @@ struct HomeView: View {
                                 .shadow(color: .black.opacity(0.4), radius: 4, x: 4, y: 4)
                             }
                             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-                            .padding(.bottom, isIPad ? 32 : 24)
+                            .padding(.bottom, isIPad ? 36 : 24)
                         }
-                        .padding(.bottom, isIPad ? 80 : 20)
+                        .padding(.bottom, isIPad ? 20 : 20)
                         
                         // MARK: - My Books Section
-                        VStack(alignment: .leading, spacing: isIPad ? 16 : 8) {
+                        VStack(alignment: .leading, spacing: isIPad ? 20 : 8) {
                             Button {
                                 selectedTab = .dashboard
                             } label: {
@@ -86,6 +87,7 @@ struct HomeView: View {
                                 .padding(.leading, isIPad ? 40 : 23)
                             }
                             .tint(.theme.text)
+                            .padding(.top, isIPad ? 112 : 0)
                             
                             if profileViewModel.user != nil {
                                 ScrollView(.horizontal, showsIndicators: false) {
@@ -105,7 +107,7 @@ struct HomeView: View {
                         }
                         
                         // MARK: - Explore Section
-                        VStack(alignment: .leading, spacing: isIPad ? 16 : 8) {
+                        VStack(alignment: .leading, spacing: isIPad ? 20 : 8) {
                             Button {
                                 selectedTab = .explore
                             } label: {
