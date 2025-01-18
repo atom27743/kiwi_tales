@@ -11,6 +11,7 @@ import FirebaseAuth
 enum AlertType {
     case authenticationRequired
     case insufficientInformation
+    case dailyLimitReached
 }
 
 struct GenerateStoryView: View {
@@ -118,6 +119,12 @@ struct GenerateStoryView: View {
                                 message: Text(alertMessage),
                                 dismissButton: .default(Text("OK"))
                             )
+                        case .dailyLimitReached:
+                            return Alert(
+                                title: Text("Daily Limit Reached"),
+                                message: Text(alertMessage),
+                                dismissButton: .default(Text("OK"))
+                            )
                         case .none:
                             return Alert(title: Text("Error"))
                         }
@@ -192,8 +199,29 @@ struct GenerateStoryView: View {
                 alertMessage = "Please sign in to save your stories"
                 showAlert = true
             } else {
-                // User is authenticated with SSO, proceed with generation
-                createStory = true
+                // Add book limit check here
+                Task {
+                    do {
+                        let canCreate = try await BookLimitService.shared.canCreateBook()
+                        if canCreate {
+                            // User is authenticated with SSO and has not reached limit
+                            createStory = true
+                        } else {
+                            let remaining = try await BookLimitService.shared.getRemainingBooks()
+                            await MainActor.run {
+                                alertType = .dailyLimitReached
+                                alertMessage = "You've reached your daily limit of 2 books. Try again tomorrow!"
+                                showAlert = true
+                            }
+                        }
+                    } catch {
+                        await MainActor.run {
+                            alertType = .authenticationRequired
+                            alertMessage = "Unable to verify book limit: \(error.localizedDescription)"
+                            showAlert = true
+                        }
+                    }
+                }
             }
         } else {
             if validateCurrentPage() {
