@@ -14,94 +14,50 @@ struct CustomSideNavigationHeader: View {
         VStack(spacing: 24) {
             if let user = profileViewModel.user {
                 if let photoURL = user.photoURL, let url = URL(string: photoURL) {
-                    AsyncImage(url: url) { image in
-                        image
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 80, height: 80)
-                            .clipShape(Circle())
-                            .background(
-                                Circle()
-                                    .stroke(Color(hex: "FFFCF6") ?? .white, lineWidth: 6)
-                                    .background(
-                                        Circle()
-                                            .stroke(
-                                                Color(hex: "DAECED") ?? Color.white,
-                                                lineWidth: 2
-                                            )
-                                            .hueGradient()
-                                    )
-                            )
-                    } placeholder: {
-                        Circle()
-                            .frame(width: 80, height: 80)
-                            .foregroundColor(.gray)
-                    }
+                    profile_pic(url: url)
                 } else if let displayName = user.name {
                     // Show initials avatar when no profile picture is available
                     ZStack {
                         Circle()
                             .fill(displayName.profileColor)
-                            .frame(width: 80, height: 80)
-                            .background(
-                                Circle()
-                                    .stroke(Color(hex: "FFFCF6") ?? .white, lineWidth: 6)
-                                    .background(
-                                        Circle()
-                                            .stroke(
-                                                Color(hex: "DAECED") ?? Color.white,
-                                                lineWidth: 2
-                                            )
-                                            .hueGradient()
-                                    )
-                            )
+                            .frame(width: 90, height: 90)
+                            .background(default_profile_mod)
                         
                         Text(displayName.initials)
-                            .font(.system(size: 32, weight: .bold))
+                            .font(.system(size: 34, weight: .bold))
                             .foregroundColor(.white)
                     }
                 } else {
                     // Fallback when neither photo nor name is available
                     Circle()
                         .fill(Color.gray)
-                        .frame(width: 80, height: 80)
+                        .frame(width: 90, height: 90)
                         .overlay(
                             Image("kiwi_profile")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(width: 80, height: 80)
+                                .frame(width: 90, height: 90)
                         )
-                        .background(
-                            Circle()
-                                .stroke(Color(hex: "FFFCF6") ?? .white, lineWidth: 6)
-                                .background(
-                                    Circle()
-                                        .stroke(
-                                            Color(hex: "DAECED") ?? Color.white,
-                                            lineWidth: 2
-                                        )
-                                        .hueGradient()
-                                )
-                        )
+                        .background(default_profile_mod)
                 }
                 
                 if let displayName = user.name {
                     Text("Hello, \(displayName)")
-                        .font(.headline)
+                        .nunito(.semiBold, 20)
                         .foregroundStyle(Color.theme.text)
                 } else {
                     Text("Welcome!")
-                        .font(.headline)
+                        .nunito(.semiBold, 20)
                         .foregroundStyle(Color.theme.text)
                 }
             } else {
                 Image("kiwi_profile")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 80, height: 80)
+                    .frame(width: 90, height: 90)
                 
                 Text("Welcome!")
-                    .font(.headline)
+                    .nunito(.semiBold, 20)
                     .foregroundStyle(Color.theme.text)
             }
         }
@@ -113,12 +69,51 @@ struct CustomSideNavigationHeader: View {
         }
     }
     
+    private var default_profile_mod: some View {
+        Circle()
+            .stroke(Color(hex: "FFFCF6") ?? .white, lineWidth: 6)
+            .background(
+                Circle()
+                    .stroke(
+                        Color(hex: "DAECED") ?? Color.white,
+                        lineWidth: 2
+                    )
+                    .hueGradient()
+            )
+    }
+    
     private func loadUserProfile() async {
         do {
             try await profileViewModel.loadCurrentUser()
             print("Profile loaded: \(profileViewModel.user?.name ?? "No user")")
         } catch {
             print("Failed to load current user: \(error.localizedDescription)")
+        }
+    }
+    
+    private func profile_pic(url: URL) -> some View {
+        AsyncImage(url: url) { image in
+            image
+                .resizable()
+                .scaledToFit()
+                .frame(width: 90, height: 90)
+                .clipShape(Circle())
+                .background(
+                    Circle()
+                        .stroke(Color(hex: "FFFCF6") ?? .white, lineWidth: 6)
+                        .background(
+                            Circle()
+                                .stroke(
+                                    Color(hex: "DAECED") ?? Color.white,
+                                    lineWidth: 2
+                                )
+                                .hueGradient()
+                        )
+                )
+        } placeholder: {
+            Circle()
+                .frame(width: 90, height: 90)
+                .foregroundColor(.gray)
         }
     }
 }

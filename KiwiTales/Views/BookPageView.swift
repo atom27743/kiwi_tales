@@ -67,7 +67,11 @@ struct BookPageView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .frame(height: 260)
-                .background(.black.opacity(0.5), in: RoundedRectangle(cornerRadius: 30.0))
+                .background(
+                    Rectangle()
+                        .fill(.black.opacity(0.5))
+                        .cornerRadius(30.0, corners: [.topLeft, .topRight])
+                )
                 .ignoresSafeArea(edges: .bottom)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
