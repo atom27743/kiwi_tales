@@ -9,27 +9,6 @@ import SwiftUI
 import UIKit
 import FirebaseAuth
 
-struct LoadingView: View {
-    let message: String
-    let progress: Double
-
-    var body: some View {
-        VStack {
-            ProgressView(value: progress, total: 1.0)
-                .progressViewStyle(.linear)
-                .frame(width: 200)
-                .padding(.bottom, 8)
-            Text(message)
-                .font(.headline)
-                .foregroundColor(.primary)
-        }
-        .padding()
-        .background(Material.ultraThinMaterial)
-        .cornerRadius(10)
-        .shadow(radius: 5)
-    }
-}
-
 struct ErrorView: View {
     let message: String
     let retryAction: () -> Void
@@ -139,8 +118,7 @@ struct StoryView: View {
     var body: some View {
         ZStack {
             if viewModel.isLoading {
-                ProgressView("Generating your story...")
-                    .padding()
+                LoadingIndicator(viewModel: viewModel)
             } else if let error = viewModel.errorMessage {
                 ErrorView(message: error) {
                     viewModel.generateStory()
@@ -379,6 +357,6 @@ struct StoryView: View {
     }
 }
 
-#Preview {
-    StoryView(viewModel: .init(), selectGenerate: .constant(true))
-}
+//#Preview {
+//    StoryView(viewModel: .init(), selectGenerate: .constant(true))
+//}
