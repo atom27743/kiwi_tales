@@ -241,7 +241,7 @@ class GenerateStoryViewModel: ObservableObject {
         
         Task {
             do {
-                updateProgress(message: "Creating your story...")
+                updateProgress(message: "Your story is being brewed")
                 let story = try await generateStoryContent()
                 
                 DispatchQueue.main.async {
@@ -252,7 +252,7 @@ class GenerateStoryViewModel: ObservableObject {
                     self.generatedImages = Array(repeating: nil, count: story.contents.count + 1)
                 }
                 
-                updateProgress(message: "Bringing your story to life with images...")
+                updateProgress(message: "Bringing your story to life with images")
                 
                 // Generate cover image first
 //                let coverPrompt = "Create a children's picture book cover for '\(story.title)' in a 2d cute cartoon style."
